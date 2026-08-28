@@ -1,0 +1,9 @@
+services:
+  risklens:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data/audit:/app/data/audit
+    restart: unless-stopped
+

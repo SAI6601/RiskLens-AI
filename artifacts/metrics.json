@@ -1,0 +1,73 @@
+{
+  "model_version": "risklens-logistic-v1",
+  "data": {
+    "source": "deterministic synthetic payment transactions",
+    "seed": 42,
+    "total_rows": 12000,
+    "split": {
+      "train": 8400,
+      "validation": 1800,
+      "test": 1800
+    },
+    "leakage_control": "chronological 70/15/15 split; labels and attack_type excluded"
+  },
+  "threshold_selection": {
+    "dataset": "validation only",
+    "objective": "minimum estimated business cost with recall >= 0.78",
+    "threshold": 0.475,
+    "recall": 0.877301,
+    "precision": 0.821839,
+    "cost": 10366.860398,
+    "review_cost_inr": 35.0,
+    "missed_fraud_loss_rate": 0.65
+  },
+  "held_out_test": {
+    "rows": 1800,
+    "fraud_prevalence": 0.078333,
+    "threshold": 0.475,
+    "precision": 0.756098,
+    "recall": 0.879433,
+    "f1": 0.813115,
+    "roc_auc": 0.927312,
+    "pr_auc": 0.791757,
+    "brier_score": 0.037528,
+    "confusion_matrix": {
+      "tn": 1619,
+      "fp": 40,
+      "fn": 17,
+      "tp": 124
+    },
+    "false_positive_rate": 0.024111,
+    "false_positive_review_cost_inr": 1400.0,
+    "caught_fraud_amount_inr": 137259.63,
+    "missed_fraud_amount_inr": 10676.54,
+    "estimated_total_cost_inr": 8339.75
+  },
+  "rule_baseline_test": {
+    "rows": 1800,
+    "fraud_prevalence": 0.078333,
+    "threshold": 0.5,
+    "precision": 0.4,
+    "recall": 0.751773,
+    "f1": 0.522167,
+    "roc_auc": 0.827966,
+    "pr_auc": 0.320154,
+    "brier_score": 0.107778,
+    "confusion_matrix": {
+      "tn": 1500,
+      "fp": 159,
+      "fn": 35,
+      "tp": 106
+    },
+    "false_positive_rate": 0.095841,
+    "false_positive_review_cost_inr": 5565.0,
+    "caught_fraud_amount_inr": 120840.3,
+    "missed_fraud_amount_inr": 27095.87,
+    "estimated_total_cost_inr": 23177.32
+  },
+  "limitations": [
+    "Results are from synthetic data and are not production performance claims.",
+    "Labels approximate three known fraud archetypes and may not represent novel attacks.",
+    "Human review is required for high-risk decisions; the model never permanently blocks an account."
+  ]
+}

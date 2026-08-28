@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="RiskLens AI — explainable payment fraud-risk decision support." />
+    <title>RiskLens AI · Payment Risk Manager</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="RiskLens AI home">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>RiskLens <b>AI</b></span>
+      </a>
+      <nav aria-label="Main navigation">
+        <a href="#assess">Live assessment</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#architecture">Architecture</a>
+      </nav>
+      <span class="system-status"><i></i> Model online</span>
+    </header>
+
+    <main id="top">
+      <section class="hero container">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>Defence-only</span> · Razorpay AI Risk Manager track</p>
+          <h1>Stop fraud bursts<br />before they become <em>losses.</em></h1>
+          <p class="hero-intro">
+            Explainable risk scoring, merchant-level spike detection and bounded interventions—built
+            for analysts who need evidence, not a black box.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#assess">Run a live assessment <span>↘</span></a>
+            <a class="button secondary" href="/docs">Explore the API</a>
+          </div>
+          <div class="trust-strip">
+            <div><strong>Human-gated</strong><span>No permanent auto-blocks</span></div>
+            <div><strong>Auditable</strong><span>Reason codes on every decision</span></div>
+            <div><strong>Measured</strong><span>Chronological held-out test</span></div>
+          </div>
+        </div>
+
+        <div class="signal-card" aria-label="Live risk signal illustration">
+          <div class="signal-header">
+            <div><span>Merchant pulse</span><strong>merchant_007</strong></div>
+            <span class="live-pill">LIVE</span>
+          </div>
+          <div class="pulse-chart" aria-hidden="true">
+            <svg viewBox="0 0 600 220" role="img" aria-label="Risk pulse rising into a spike">
+              <defs>
+                <linearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#48e4c2" stop-opacity=".34" />
+                  <stop offset="1" stop-color="#48e4c2" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path class="grid" d="M0 50H600M0 110H600M0 170H600" />
+              <path class="area" d="M0 180 L35 176 70 182 105 168 140 173 175 165 210 170 245 158 280 162 315 142 350 148 385 119 420 132 455 96 490 108 525 42 560 71 600 31 L600 220 L0 220Z" />
+              <path class="line" d="M0 180 L35 176 70 182 105 168 140 173 175 165 210 170 245 158 280 162 315 142 350 148 385 119 420 132 455 96 490 108 525 42 560 71 600 31" />
+              <circle cx="525" cy="42" r="7" />
+            </svg>
+          </div>
+          <div class="signal-alert">
+            <div class="alert-icon">!</div>
+            <div><strong>Velocity anomaly detected</strong><span>8 transactions / 10 min · new device cluster</span></div>
+            <span class="risk-number">0.92</span>
+          </div>
+          <div class="signal-footer">
+            <span>Recommended action</span><strong>Hold for analyst review</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="metric-ribbon" id="evidence">
+        <div class="container metrics-grid">
+          <article><span>Held-out precision</span><strong id="metric-precision">—</strong><small>Flag quality</small></article>
+          <article><span>Held-out recall</span><strong id="metric-recall">—</strong><small>Fraud captured</small></article>
+          <article><span>Held-out F1</span><strong id="metric-f1">—</strong><small>Balanced signal</small></article>
+          <article><span>False-positive rate</span><strong id="metric-fpr">—</strong><small>Customer friction</small></article>
+          <p class="metric-note">Synthetic benchmark · chronological test · results are not production claims</p>
+        </div>
+      </section>
+
+      <section class="assessment container" id="assess">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Interactive decision lab</p>
+            <h2>Inspect the signal.<br /><em>Challenge the decision.</em></h2>
+          </div>
+          <p>Switch between controlled payment scenarios. Every output exposes its threshold, reason codes and bounded response.</p>
+        </div>
+
+        <div class="assessment-grid">
+          <div class="scenario-panel panel">
+            <div class="panel-label">01 · Choose a scenario</div>
+            <div class="scenario-tabs" role="tablist" aria-label="Risk scenarios">
+              <button class="scenario-tab active" data-scenario="normal" role="tab">Normal payment</button>
+              <button class="scenario-tab" data-scenario="cardTesting" role="tab">Card-testing burst</button>
+              <button class="scenario-tab" data-scenario="takeover" role="tab">Account takeover</button>
+              <button class="scenario-tab" data-scenario="abuseRing" role="tab">Abuse ring</button>
+            </div>
+            <div class="transaction-preview" id="transaction-preview"></div>
+            <button class="button primary full" id="analyze-button">Analyze transaction <span>→</span></button>
+            <button class="text-button" id="batch-button">Run merchant burst batch instead</button>
+          </div>
+
+          <div class="decision-panel panel" aria-live="polite">
+            <div class="panel-label">02 · Explainable decision</div>
+            <div class="empty-state" id="empty-state">
+              <div class="radar"><i></i><i></i><i></i><span></span></div>
+              <strong>Ready to assess</strong>
+              <p>Select a scenario and run the model.</p>
+            </div>
+            <div class="decision-content hidden" id="decision-content">
+              <div class="decision-top">
+                <div class="risk-gauge" id="risk-gauge"><div><span id="risk-score">0</span><small>risk score</small></div></div>
+                <div class="decision-summary">
+                  <span class="decision-band" id="risk-band">—</span>
+                  <h3 id="decision-action">—</h3>
+                  <p>Threshold <strong id="decision-threshold">—</strong> · human review <strong id="human-review">—</strong></p>
+                </div>
+              </div>
+              <div class="reason-section">
+                <span>Top reason codes</span>
+                <div id="reason-list"></div>
+              </div>
+              <p class="decision-disclaimer" id="decision-disclaimer"></p>
+            </div>
+            <div class="batch-content hidden" id="batch-content">
+              <div class="batch-title"><span>Merchant batch result</span><strong id="batch-headline">—</strong></div>
+              <div class="batch-stats" id="batch-stats"></div>
+              <div class="batch-table-wrap">
+                <table><thead><tr><th>Merchant</th><th>Volume</th><th>Flagged</th><th>Avg. risk</th><th>Status</th></tr></thead><tbody id="batch-table"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="architecture" id="architecture">
+        <div class="container">
+          <div class="section-heading light">
+            <div><p class="eyebrow">Bounded by design</p><h2>From payment event<br />to <em>auditable action.</em></h2></div>
+            <p>The model advises; policy gates the response; a human owns the highest-impact decision.</p>
+          </div>
+          <div class="flow">
+            <article><b>01</b><span class="flow-icon">⌁</span><h3>Signal intake</h3><p>Validated behavioural features; no raw card credentials.</p></article>
+            <i>→</i>
+            <article><b>02</b><span class="flow-icon">◫</span><h3>Risk model</h3><p>Calibrated probability using an explainable logistic model.</p></article>
+            <i>→</i>
+            <article><b>03</b><span class="flow-icon">⌁</span><h3>Spike sentinel</h3><p>Merchant-level flagged rate with a minimum-volume guard.</p></article>
+            <i>→</i>
+            <article><b>04</b><span class="flow-icon">✓</span><h3>Policy gate</h3><p>Allow, monitor, step-up or hold—never permanent auto-block.</p></article>
+            <i>→</i>
+            <article><b>05</b><span class="flow-icon">◎</span><h3>Audit trail</h3><p>Model version, score, reasons and action recorded.</p></article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer><div class="container"><span>RiskLens AI · Defence-only prototype</span><span>Built for transparent payment risk decisions</span></div></footer>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
+
