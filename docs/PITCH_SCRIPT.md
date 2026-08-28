@@ -2,7 +2,11 @@
 
 Target duration: 4:40–5:00. Speak naturally; do not read the headings.
 
-## 0:00–0:35 — Problem
+Use this narration together with [`PRESENTATION_STORYBOARD.md`](PRESENTATION_STORYBOARD.md). Let the opening animation play for roughly two seconds before speaking.
+
+## 0:00–0:35 — Cold open and problem
+
+“A fraud score is easy. A decision you can explain, measure and safely act on is much harder.”
 
 “Payment fraud rarely arrives as one obvious event. It can look like a burst of low-value card tests, an account suddenly paying from a new device and location, or a cluster sharing cards and devices. A useful Risk Manager must detect these signals without creating unlimited customer friction or hiding behind a black-box score.”
 
@@ -51,4 +55,3 @@ Show the evidence cards and `artifacts/metrics.json`.
 “These are synthetic-data results, not production claims. The next step would be evaluation on approved real data, authenticated event ingestion, drift monitoring, analyst feedback labels and model-registry governance.”
 
 “RiskLens demonstrates the product principle I believe an AI Risk Manager needs: detect quickly, explain clearly, act within limits and keep a human accountable for the highest-impact decision.”
-

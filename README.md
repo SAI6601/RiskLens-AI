@@ -153,6 +153,7 @@ docs/                   Architecture, model card, pitch and application draft
 
 - [`docs/APPLICATION_ANSWERS.md`](docs/APPLICATION_ANSWERS.md) — form-ready project objective and build challenges
 - [`docs/PITCH_SCRIPT.md`](docs/PITCH_SCRIPT.md) — timed five-minute demonstration script
+- [`docs/PRESENTATION_STORYBOARD.md`](docs/PRESENTATION_STORYBOARD.md) — cinematic shot plan and delivery guidance
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — component and decision flow
 - [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) — intended use, evaluation and limitations
 
