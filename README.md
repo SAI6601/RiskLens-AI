@@ -41,6 +41,10 @@ The report also exposes false-positive review cost, caught fraud amount, missed 
 5. **Auditable:** a privacy-minimized JSONL record stores transaction ID, merchant ID, score, action, reasons and model version—never raw payment credentials.
 6. **Honest:** limitations and synthetic-data boundaries are visible in both the UI and model card.
 
+## Product experience
+
+The dashboard uses an original motion system to make the risk workflow easier to follow: a short signal-to-evidence opening sequence, animated merchant pulse, scroll-triggered metric counts, staged reason-code reveals and an easing risk gauge. Motion remains functional rather than decorative and automatically collapses under the operating system's `prefers-reduced-motion` accessibility setting.
+
 ## Architecture
 
 ```mermaid

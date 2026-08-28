@@ -1,3 +1,7 @@
+document.documentElement.classList.add("motion-enabled");
+const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
+const reducedMotion = () => motionPreference.matches;
+
 const base = {
   transaction_id: "txn_live_001",
   merchant_id: "merchant_042",
@@ -28,6 +32,61 @@ let activeScenario = "normal";
 const formatMoney = value => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
 const percent = value => `${(value * 100).toFixed(1)}%`;
 
+function replayClass(element, className) {
+  element.classList.remove(className);
+  void element.offsetWidth;
+  element.classList.add(className);
+}
+
+function animateMetric(element) {
+  if (!element.dataset.metricValue || element.dataset.animated) return;
+  element.dataset.animated = "true";
+  const target = Number(element.dataset.metricValue) * 100;
+  if (reducedMotion()) {
+    element.textContent = `${target.toFixed(1)}%`;
+    return;
+  }
+  const start = performance.now();
+  const duration = 900;
+  const tick = now => {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 4);
+    element.textContent = `${(target * eased).toFixed(1)}%`;
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function setMetric(selector, value) {
+  const element = document.querySelector(selector);
+  element.dataset.metricValue = value;
+  element.textContent = reducedMotion() ? percent(value) : "0.0%";
+  if (element.closest("article")?.classList.contains("is-visible")) animateMetric(element);
+}
+
+function animateGauge(score, color) {
+  const gauge = document.querySelector("#risk-gauge");
+  const number = document.querySelector("#risk-score");
+  const from = Number(gauge.dataset.score || 0);
+  gauge.dataset.score = score;
+  if (reducedMotion()) {
+    gauge.style.background = `conic-gradient(${color} ${score * 360}deg, #dfe5df 0deg)`;
+    number.textContent = score.toFixed(2);
+    return;
+  }
+  const start = performance.now();
+  const duration = 720;
+  const tick = now => {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = from + (score - from) * eased;
+    gauge.style.background = `conic-gradient(${color} ${current * 360}deg, #dfe5df 0deg)`;
+    number.textContent = current.toFixed(2);
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
 function renderPreview() {
   const item = scenarios[activeScenario];
   const rows = [
@@ -39,7 +98,9 @@ function renderPreview() {
     ["Device", item.is_new_device ? "Newly observed" : `${item.device_age_days} days old`],
     ["Shared cluster", `${item.shared_cards_24h} cards · ${item.shared_devices_24h} devices`],
   ];
-  document.querySelector("#transaction-preview").innerHTML = rows.map(([label, value]) => `<div class="preview-row"><span>${label}</span><strong>${value}</strong></div>`).join("");
+  const preview = document.querySelector("#transaction-preview");
+  preview.innerHTML = rows.map(([label, value]) => `<div class="preview-row"><span>${label}</span><strong>${value}</strong></div>`).join("");
+  if (!reducedMotion()) replayClass(preview, "is-switching");
 }
 
 async function loadMetrics() {
@@ -48,10 +109,10 @@ async function loadMetrics() {
     if (!response.ok) throw new Error("Metrics unavailable");
     const data = await response.json();
     const metrics = data.held_out_test;
-    document.querySelector("#metric-precision").textContent = percent(metrics.precision);
-    document.querySelector("#metric-recall").textContent = percent(metrics.recall);
-    document.querySelector("#metric-f1").textContent = percent(metrics.f1);
-    document.querySelector("#metric-fpr").textContent = percent(metrics.false_positive_rate);
+    setMetric("#metric-precision", metrics.precision);
+    setMetric("#metric-recall", metrics.recall);
+    setMetric("#metric-f1", metrics.f1);
+    setMetric("#metric-fpr", metrics.false_positive_rate);
   } catch (error) {
     console.error(error);
   }
@@ -60,12 +121,12 @@ async function loadMetrics() {
 function renderDecision(decision) {
   document.querySelector("#empty-state").classList.add("hidden");
   document.querySelector("#batch-content").classList.add("hidden");
-  document.querySelector("#decision-content").classList.remove("hidden");
+  const content = document.querySelector("#decision-content");
+  content.classList.remove("hidden");
+  if (!reducedMotion()) replayClass(content, "is-entering");
   const score = decision.risk_score;
   const color = score >= .82 ? "#ff6c72" : score >= decision.threshold ? "#ffb86b" : "#48e4c2";
-  const gauge = document.querySelector("#risk-gauge");
-  gauge.style.background = `conic-gradient(${color} ${score * 360}deg, #dfe5df 0deg)`;
-  document.querySelector("#risk-score").textContent = score.toFixed(2);
+  animateGauge(score, color);
   document.querySelector("#risk-band").textContent = `${decision.risk_band} risk`;
   document.querySelector("#decision-action").textContent = decision.recommended_action.replaceAll("_", " ");
   document.querySelector("#decision-threshold").textContent = decision.threshold.toFixed(3);
@@ -116,7 +177,9 @@ async function analyzeBatch() {
     const data = await response.json();
     document.querySelector("#empty-state").classList.add("hidden");
     document.querySelector("#decision-content").classList.add("hidden");
-    document.querySelector("#batch-content").classList.remove("hidden");
+    const content = document.querySelector("#batch-content");
+    content.classList.remove("hidden");
+    if (!reducedMotion()) replayClass(content, "is-entering");
     document.querySelector("#batch-headline").textContent = data.summary.merchant_spikes ? "Fraud spike surfaced" : "No merchant spike";
     document.querySelector("#batch-stats").innerHTML = [
       ["Transactions", data.summary.transactions], ["Flagged", data.summary.flagged], ["Average risk", data.summary.average_risk.toFixed(2)]
@@ -130,13 +193,74 @@ async function analyzeBatch() {
   }
 }
 
-document.querySelectorAll(".scenario-tab").forEach(tab => tab.addEventListener("click", () => {
-  document.querySelectorAll(".scenario-tab").forEach(item => item.classList.remove("active"));
+document.querySelectorAll(".scenario-tab").forEach((tab, index) => {
+  tab.setAttribute("aria-selected", index === 0 ? "true" : "false");
+  tab.addEventListener("click", () => {
+  document.querySelectorAll(".scenario-tab").forEach(item => {
+    item.classList.remove("active");
+    item.setAttribute("aria-selected", "false");
+  });
   tab.classList.add("active");
+  tab.setAttribute("aria-selected", "true");
   activeScenario = tab.dataset.scenario;
   renderPreview();
-}));
+  });
+});
 document.querySelector("#analyze-button").addEventListener("click", analyze);
 document.querySelector("#batch-button").addEventListener("click", analyzeBatch);
+
+function initializeExperience() {
+  const boot = document.querySelector(".boot-sequence");
+  const revealTargets = [
+    ...document.querySelectorAll(".metrics-grid article"),
+    ...document.querySelectorAll(".section-heading > *"),
+    ...document.querySelectorAll(".assessment-grid"),
+    ...document.querySelectorAll(".flow article"),
+  ];
+  revealTargets.forEach((element, index) => {
+    element.classList.add("will-reveal");
+    element.style.setProperty("--reveal-delay", `${(index % 5) * 70}ms`);
+  });
+
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      entry.target.querySelectorAll("[data-metric-value]").forEach(animateMetric);
+      if (entry.target.matches("[data-metric-value]")) animateMetric(entry.target);
+      revealObserver.unobserve(entry.target);
+    });
+  }, { threshold: .16, rootMargin: "0px 0px -40px" });
+  revealTargets.forEach(element => revealObserver.observe(element));
+
+  const header = document.querySelector(".site-header");
+  const setHeaderState = () => header.classList.toggle("is-scrolled", window.scrollY > 24);
+  setHeaderState();
+  window.addEventListener("scroll", setHeaderState, { passive: true });
+
+  const signalCard = document.querySelector(".signal-card");
+  if (!reducedMotion() && window.matchMedia("(pointer: fine)").matches) {
+    signalCard.addEventListener("pointermove", event => {
+      const rect = signalCard.getBoundingClientRect();
+      const x = (event.clientX - rect.left) / rect.width - .5;
+      const y = (event.clientY - rect.top) / rect.height - .5;
+      signalCard.style.transition = "transform .16s ease-out, box-shadow .25s ease";
+      signalCard.style.transform = `perspective(950px) rotateX(${-y * 3.4}deg) rotateY(${x * 4.2}deg) translateZ(0)`;
+    });
+    signalCard.addEventListener("pointerleave", () => {
+      signalCard.style.transform = "perspective(950px) rotateX(0) rotateY(0) translateZ(0)";
+    });
+  }
+
+  const revealExperience = () => {
+    document.documentElement.classList.add("experience-ready");
+    boot.classList.add("is-complete");
+    window.setTimeout(() => boot.remove(), 850);
+  };
+  if (reducedMotion()) revealExperience();
+  else window.setTimeout(revealExperience, 1250);
+}
+
 renderPreview();
 loadMetrics();
+initializeExperience();

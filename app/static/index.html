@@ -8,6 +8,19 @@
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
+    <div class="boot-sequence" aria-hidden="true">
+      <div class="boot-scanline"></div>
+      <div class="boot-brand">
+        <span class="boot-mark"><i></i><i></i><i></i></span>
+        <span>RiskLens <b>AI</b></span>
+      </div>
+      <div class="boot-message">
+        <span>Signal</span><i></i><span>Evidence</span><i></i><span>Action</span>
+      </div>
+      <div class="boot-progress"><i></i></div>
+      <small>Initializing bounded risk intelligence</small>
+    </div>
+    <div class="motion-grain" aria-hidden="true"></div>
     <div class="ambient ambient-one"></div>
     <div class="ambient ambient-two"></div>
 
@@ -28,7 +41,10 @@
       <section class="hero container">
         <div class="hero-copy">
           <p class="eyebrow"><span>Defence-only</span> · Razorpay AI Risk Manager track</p>
-          <h1>Stop fraud bursts<br />before they become <em>losses.</em></h1>
+          <h1 aria-label="Stop fraud bursts before they become losses.">
+            <span class="reveal-line"><span>Stop fraud bursts</span></span>
+            <span class="reveal-line"><span>before they become <em>losses.</em></span></span>
+          </h1>
           <p class="hero-intro">
             Explainable risk scoring, merchant-level spike detection and bounded interventions—built
             for analysts who need evidence, not a black box.
@@ -45,6 +61,7 @@
         </div>
 
         <div class="signal-card" aria-label="Live risk signal illustration">
+          <div class="signal-sweep" aria-hidden="true"></div>
           <div class="signal-header">
             <div><span>Merchant pulse</span><strong>merchant_007</strong></div>
             <span class="live-pill">LIVE</span>
@@ -60,7 +77,7 @@
               <path class="grid" d="M0 50H600M0 110H600M0 170H600" />
               <path class="area" d="M0 180 L35 176 70 182 105 168 140 173 175 165 210 170 245 158 280 162 315 142 350 148 385 119 420 132 455 96 490 108 525 42 560 71 600 31 L600 220 L0 220Z" />
               <path class="line" d="M0 180 L35 176 70 182 105 168 140 173 175 165 210 170 245 158 280 162 315 142 350 148 385 119 420 132 455 96 490 108 525 42 560 71 600 31" />
-              <circle cx="525" cy="42" r="7" />
+              <circle class="signal-point" cx="525" cy="42" r="7" />
             </svg>
           </div>
           <div class="signal-alert">
@@ -165,4 +182,3 @@
     <script src="/static/app.js" defer></script>
   </body>
 </html>
-
