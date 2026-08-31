@@ -146,11 +146,11 @@ class RiskEngine:
                 + 0.05 * transaction.is_new_device,
                 1.0,
             )
-            if score < 0.25:
+            if score < 0.20:
                 band, action = "low", "allow_and_monitor"
-            elif score < 0.55:
+            elif score < 0.40:
                 band, action = "medium", "allow_and_monitor"
-            elif score < 0.78:
+            elif score < 0.72:
                 band, action = "high", "step_up_auth"
             else:
                 band, action = "critical", "hold_for_review"
@@ -175,7 +175,7 @@ class RiskEngine:
                     transaction_id=transaction.transaction_id,
                     merchant_id=transaction.merchant_id,
                     risk_score=round(score, 6),
-                    threshold=0.55,
+                    threshold=0.40,
                     risk_band=band,
                     recommended_action=action,
                     reasons=reasons,

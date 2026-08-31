@@ -29,8 +29,11 @@ const scenarios = {
 };
 
 let activeScenario = "normal";
+let currentSystemMode = "normal";
 const formatMoney = value => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(value);
 const percent = value => `${(value * 100).toFixed(1)}%`;
+const escapeHtml = value => String(value).replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
+const titleCase = value => String(value).replaceAll("_", " ").replace(/\b\w/g, character => character.toUpperCase());
 
 function replayClass(element, className) {
   element.classList.remove(className);
@@ -159,20 +162,157 @@ async function analyze() {
 function buildBatch() {
   const transactions = [];
   for (let i = 0; i < 7; i += 1) {
-    transactions.push({ ...scenarios.cardTesting, transaction_id: `txn_burst_${String(i).padStart(3, "0")}`, amount: 40 + i * 18, tx_count_10m: 12 + i, merchant_id: "merchant_007" });
+    transactions.push({
+      ...scenarios.cardTesting,
+      transaction_id: `txn_burst_${String(i).padStart(3, "0")}`,
+      amount: 40 + i * 18,
+      tx_count_10m: 12 + i,
+      merchant_id: "merchant_007",
+      customer_ref: `cus_demo_${String(i).padStart(2, "0")}`,
+      device_ref: "dev_shared_x17",
+      payment_instrument_ref: `card_token_${String(i).padStart(2, "0")}`,
+      network_ref: "net_cluster_blr_04",
+    });
   }
   for (let i = 0; i < 7; i += 1) {
-    transactions.push({ ...scenarios.normal, transaction_id: `txn_normal_${String(i).padStart(3, "0")}`, amount: 700 + i * 130, merchant_id: "merchant_042" });
+    transactions.push({
+      ...scenarios.normal,
+      transaction_id: `txn_normal_${String(i).padStart(3, "0")}`,
+      amount: 700 + i * 130,
+      merchant_id: "merchant_042",
+      customer_ref: `cus_normal_${String(i).padStart(2, "0")}`,
+      device_ref: `dev_normal_${String(i).padStart(2, "0")}`,
+      payment_instrument_ref: `card_normal_${String(i).padStart(2, "0")}`,
+      network_ref: `net_normal_${String(i).padStart(2, "0")}`,
+    });
   }
   return transactions;
 }
 
-async function analyzeBatch() {
+function renderConstellation(constellation) {
+  const svg = document.querySelector("#constellation-svg");
+  const nodes = constellation.nodes.slice(0, 24);
+  const nodeIds = new Set(nodes.map(node => node.id));
+  const merchant = nodes.find(node => node.kind === "merchant");
+  const hubs = nodes.filter(node => node.suspicious && !["merchant", "transaction"].includes(node.kind));
+  const transactions = nodes.filter(node => node.kind === "transaction");
+  const references = nodes.filter(node => !node.suspicious && !["merchant", "transaction"].includes(node.kind)).slice(0, 7);
+  const positions = new Map();
+  if (merchant) positions.set(merchant.id, { x: 320, y: 170 });
+  hubs.forEach((node, index) => {
+    const angle = -Math.PI / 2 + index * (Math.PI * 2 / Math.max(hubs.length, 1));
+    positions.set(node.id, { x: 320 + Math.cos(angle) * 88, y: 170 + Math.sin(angle) * 72 });
+  });
+  transactions.forEach((node, index) => {
+    const angle = -Math.PI / 2 + index * (Math.PI * 2 / Math.max(transactions.length, 1));
+    positions.set(node.id, { x: 320 + Math.cos(angle) * 150, y: 170 + Math.sin(angle) * 132 });
+  });
+  references.forEach((node, index) => {
+    const angle = -Math.PI / 2 + (index + .5) * (Math.PI * 2 / Math.max(references.length, 1));
+    positions.set(node.id, { x: 320 + Math.cos(angle) * 204, y: 170 + Math.sin(angle) * 150 });
+  });
+
+  const edges = constellation.edges.filter(edge => nodeIds.has(edge.source) && nodeIds.has(edge.target) && positions.has(edge.source) && positions.has(edge.target));
+  const edgeMarkup = edges.map((edge, index) => {
+    const source = positions.get(edge.source);
+    const target = positions.get(edge.target);
+    const connectedToHub = hubs.some(node => node.id === edge.target || node.id === edge.source);
+    return `<line class="graph-edge ${connectedToHub ? "is-hot" : ""}" style="--edge-delay:${index * 22}ms" x1="${source.x}" y1="${source.y}" x2="${target.x}" y2="${target.y}"></line>`;
+  }).join("");
+  const nodeMarkup = nodes.filter(node => positions.has(node.id)).map((node, index) => {
+    const point = positions.get(node.id);
+    const radius = node.kind === "merchant" ? 23 : node.suspicious && node.kind !== "transaction" ? 15 : node.kind === "transaction" ? 7 : 9;
+    const showLabel = node.kind === "merchant" || (node.suspicious && node.kind !== "transaction");
+    return `<g class="graph-node kind-${node.kind} ${node.suspicious ? "is-suspicious" : ""}" style="--node-delay:${index * 38}ms" transform="translate(${point.x} ${point.y})"><circle r="${radius}"></circle>${showLabel ? `<text y="${radius + 18}" text-anchor="middle">${escapeHtml(node.label)}</text>` : ""}</g>`;
+  }).join("");
+  svg.innerHTML = `<g class="graph-edges">${edgeMarkup}</g><g class="graph-nodes">${nodeMarkup}</g>`;
+}
+
+function replayIncidentTimeline() {
+  const steps = [...document.querySelectorAll(".replay-step")];
+  steps.forEach(step => step.classList.remove("is-active", "is-complete"));
+  if (reducedMotion()) {
+    steps.forEach((step, index) => step.classList.add(index === steps.length - 1 ? "is-active" : "is-complete"));
+    return;
+  }
+  steps.forEach((step, index) => {
+    window.setTimeout(() => {
+      steps.forEach((item, itemIndex) => {
+        item.classList.toggle("is-active", itemIndex === index);
+        item.classList.toggle("is-complete", itemIndex < index);
+      });
+    }, index * 260);
+  });
+}
+
+function renderIncident(data) {
+  const incident = data.incidents.find(item => item.risk_twin.status === "attack") || data.incidents[0];
+  if (!incident) return;
+  currentSystemMode = data.system_mode;
+  document.querySelector("#incident-awaiting").classList.add("hidden");
+  const consolePanel = document.querySelector("#incident-console");
+  consolePanel.classList.remove("hidden");
+  replayClass(consolePanel, "is-replaying");
+
+  const degraded = data.system_mode === "degraded";
+  const mode = document.querySelector("#system-mode");
+  mode.classList.toggle("is-degraded", degraded);
+  mode.innerHTML = `<i></i> ${degraded ? "Degraded safety mode" : "Primary model online"}`;
+  document.querySelector(".system-status").innerHTML = `<i></i> ${degraded ? "Fallback rules active" : "Model online"}`;
+  document.querySelector("#failure-button").textContent = degraded ? "Restore primary model" : "Simulate model failure";
+  document.querySelector("#incident-headline").textContent = degraded ? "Model unavailable · automation disabled" : titleCase(incident.attack_dna.dominant_pattern);
+  document.querySelector("#incident-merchant").textContent = incident.merchant_id;
+
+  const twin = incident.risk_twin;
+  document.querySelector("#twin-status").textContent = twin.status.toUpperCase();
+  document.querySelector("#twin-deviation").textContent = twin.deviation_score.toFixed(2);
+  document.querySelector("#twin-explanation").textContent = twin.explanation;
+  document.querySelector("#baseline-risk").textContent = twin.baseline.average_risk.toFixed(2);
+  document.querySelector("#observed-risk").textContent = twin.observed.average_risk.toFixed(2);
+  document.querySelector("#baseline-velocity").textContent = `${twin.baseline.average_velocity_10m.toFixed(1)} / 10m`;
+  document.querySelector("#observed-velocity").textContent = `${twin.observed.average_velocity_10m.toFixed(1)} / 10m`;
+  document.querySelector("#baseline-risk-bar").style.width = `${Math.max(twin.baseline.average_risk * 100, 2)}%`;
+  document.querySelector("#observed-risk-bar").style.width = `${Math.max(twin.observed.average_risk * 100, 2)}%`;
+
+  const dna = incident.attack_dna;
+  document.querySelector("#dna-fingerprint").textContent = dna.fingerprint_id;
+  document.querySelector("#dna-pattern").textContent = titleCase(dna.dominant_pattern);
+  document.querySelector("#dna-confidence").textContent = `${percent(dna.confidence)} affinity`;
+  document.querySelector("#dna-narrative").textContent = dna.narrative;
+  document.querySelector("#affinity-bars").innerHTML = Object.entries(dna.pattern_affinities).map(([name, value]) => `
+    <div class="affinity-row"><span>${escapeHtml(titleCase(name))}</span><i><b style="width:${value * 100}%"></b></i><strong>${percent(value)}</strong></div>`).join("");
+  document.querySelector("#dna-signals").innerHTML = dna.signals.map(signal => `
+    <span class="dna-signal severity-${signal.severity}"><i></i>${escapeHtml(signal.code)} <strong>${escapeHtml(signal.value)}</strong></span>`).join("");
+
+  document.querySelector("#constellation-summary").textContent = `${incident.constellation.shared_hubs} shared hubs`;
+  renderConstellation(incident.constellation);
+
+  document.querySelector("#intervention-options").innerHTML = incident.interventions.map(option => `
+    <article class="intervention-option ${option.recommended ? "is-recommended" : ""}">
+      <div><span>${escapeHtml(titleCase(option.action))}</span>${option.recommended ? "<b>Recommended</b>" : ""}</div>
+      <strong>${formatMoney(option.projected_loss_prevented_inr)}</strong>
+      <small>projected loss prevented</small>
+      <dl><div><dt>Residual</dt><dd>${formatMoney(option.projected_residual_loss_inr)}</dd></div><div><dt>Friction exposure</dt><dd>${percent(option.friction_exposure_rate)}</dd></div><div><dt>Review load</dt><dd>${option.review_load}</dd></div></dl>
+    </article>`).join("");
+
+  const contract = incident.action_contract;
+  document.querySelector("#contract-action").textContent = titleCase(contract.action);
+  document.querySelector("#contract-id").textContent = contract.contract_id;
+  document.querySelector("#contract-expiry").textContent = `${contract.expires_in_minutes} minutes`;
+  document.querySelector("#contract-scope").textContent = `${contract.transaction_limit} transactions max`;
+  document.querySelector("#contract-gate").textContent = contract.human_gate_required ? "Required" : "Policy gated";
+  document.querySelector("#safety-notice").textContent = data.safety_notice;
+  replayIncidentTimeline();
+}
+
+async function analyzeBatch(simulateFailure = false) {
   const button = document.querySelector("#batch-button");
+  const failureButton = document.querySelector("#failure-button");
   button.disabled = true;
-  button.textContent = "Scanning merchant batch…";
+  failureButton.disabled = true;
+  button.textContent = simulateFailure ? "Disconnecting primary model…" : "Building merchant risk twin…";
   try {
-    const response = await fetch("/api/batch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ transactions: buildBatch() }) });
+    const response = await fetch("/api/batch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ transactions: buildBatch(), simulate_model_failure: simulateFailure }) });
     if (!response.ok) throw new Error(`Batch assessment failed (${response.status})`);
     const data = await response.json();
     document.querySelector("#empty-state").classList.add("hidden");
@@ -180,16 +320,19 @@ async function analyzeBatch() {
     const content = document.querySelector("#batch-content");
     content.classList.remove("hidden");
     if (!reducedMotion()) replayClass(content, "is-entering");
-    document.querySelector("#batch-headline").textContent = data.summary.merchant_spikes ? "Fraud spike surfaced" : "No merchant spike";
+    document.querySelector("#batch-headline").textContent = data.summary.active_incidents ? "Merchant attack surfaced" : "No merchant incident";
     document.querySelector("#batch-stats").innerHTML = [
       ["Transactions", data.summary.transactions], ["Flagged", data.summary.flagged], ["Average risk", data.summary.average_risk.toFixed(2)]
     ].map(([label, value]) => `<div class="batch-stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
     document.querySelector("#batch-table").innerHTML = data.merchant_spikes.map(row => `<tr><td>${row.merchant_id}</td><td>${row.transaction_count}</td><td>${row.flagged_count}</td><td>${row.average_risk.toFixed(2)}</td><td class="${row.alert ? "alert-yes" : "alert-no"}">${row.alert ? "SPIKE" : "NORMAL"}</td></tr>`).join("");
+    renderIncident(data);
+    document.querySelector("#incident").scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" });
   } catch (error) {
     alert(error.message);
   } finally {
     button.disabled = false;
-    button.textContent = "Run merchant burst batch instead";
+    failureButton.disabled = false;
+    button.textContent = "Launch the live merchant attack replay";
   }
 }
 
@@ -207,7 +350,8 @@ document.querySelectorAll(".scenario-tab").forEach((tab, index) => {
   });
 });
 document.querySelector("#analyze-button").addEventListener("click", analyze);
-document.querySelector("#batch-button").addEventListener("click", analyzeBatch);
+document.querySelector("#batch-button").addEventListener("click", () => analyzeBatch(false));
+document.querySelector("#failure-button").addEventListener("click", () => analyzeBatch(currentSystemMode === "normal"));
 
 function initializeExperience() {
   const boot = document.querySelector(".boot-sequence");

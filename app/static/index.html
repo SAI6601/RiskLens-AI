@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="RiskLens AI — explainable payment fraud-risk decision support." />
+    <meta name="description" content="RiskLens AI — a merchant risk twin that detects attack DNA and tests bounded interventions." />
     <title>RiskLens AI · Payment Risk Manager</title>
-    <link rel="stylesheet" href="/static/styles.css?v=cinematic-2" />
+    <link rel="stylesheet" href="/static/styles.css?v=cinematic-3" />
   </head>
   <body>
     <div class="boot-sequence" aria-hidden="true">
@@ -32,6 +32,7 @@
       </a>
       <nav aria-label="Main navigation">
         <a href="#assess">Live assessment</a>
+        <a href="#incident">Incident room</a>
         <a href="#evidence">Evidence</a>
         <a href="#architecture">Architecture</a>
       </nav>
@@ -47,16 +48,16 @@
             <span class="reveal-line"><span>before they become <em>losses.</em></span></span>
           </h1>
           <p class="hero-intro">
-            Explainable risk scoring, merchant-level spike detection and bounded interventions—built
-            for analysts who need evidence, not a black box.
+            A live merchant risk twin detects behavioural shifts, fingerprints the attack and tests
+            bounded interventions—before money actions are taken.
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#assess">Run a live assessment <span>↘</span></a>
+            <a class="button primary" href="#assess">Enter the incident room <span>↘</span></a>
             <a class="button secondary" href="/docs">Explore the API</a>
           </div>
           <div class="trust-strip">
             <div><strong>Human-gated</strong><span>No permanent auto-blocks</span></div>
-            <div><strong>Auditable</strong><span>Reason codes on every decision</span></div>
+            <div><strong>Attack-aware</strong><span>Merchant drift + relationship evidence</span></div>
             <div><strong>Measured</strong><span>Chronological held-out test</span></div>
           </div>
           <div class="hero-film-meta" aria-hidden="true">
@@ -125,7 +126,7 @@
             </div>
             <div class="transaction-preview" id="transaction-preview"></div>
             <button class="button primary full" id="analyze-button">Analyze transaction <span>→</span></button>
-            <button class="text-button" id="batch-button">Run merchant burst batch instead</button>
+            <button class="text-button" id="batch-button">Launch the live merchant attack replay</button>
           </div>
 
           <div class="decision-panel panel" aria-live="polite">
@@ -161,10 +162,101 @@
         </div>
       </section>
 
+      <section class="incident-stage" id="incident">
+        <div class="container">
+          <div class="section-heading light incident-heading">
+            <div>
+              <p class="eyebrow">Act III · Respond / Merchant incident room</p>
+              <h2>See the attack form.<br /><em>Test the response.</em></h2>
+            </div>
+            <div class="incident-controls">
+              <span class="mode-pill" id="system-mode"><i></i> System ready</span>
+              <button class="button ghost" id="failure-button">Simulate model failure</button>
+            </div>
+          </div>
+
+          <div class="incident-awaiting" id="incident-awaiting">
+            <span class="awaiting-orbit" aria-hidden="true"><i></i><i></i><i></i></span>
+            <div><strong>Incident intelligence is standing by.</strong><p>Launch the merchant attack replay above to build the risk twin.</p></div>
+          </div>
+
+          <div class="incident-console hidden" id="incident-console" aria-live="polite">
+            <div class="incident-statusline">
+              <span id="incident-clock">T+00:18</span>
+              <strong id="incident-headline">Behavioural shift detected</strong>
+              <span id="incident-merchant">merchant_007</span>
+            </div>
+
+            <div class="replay-grid">
+              <aside class="replay-rail" aria-label="Incident replay timeline">
+                <div class="replay-step" data-step="0"><b>T−10m</b><i></i><span>Baseline stable</span></div>
+                <div class="replay-step" data-step="1"><b>T+00</b><i></i><span>Velocity changes</span></div>
+                <div class="replay-step" data-step="2"><b>T+09</b><i></i><span>Shared hubs form</span></div>
+                <div class="replay-step" data-step="3"><b>T+18</b><i></i><span>Attack DNA resolved</span></div>
+                <div class="replay-step" data-step="4"><b>T+24</b><i></i><span>Bounded action proposed</span></div>
+              </aside>
+
+              <div class="twin-panel command-panel">
+                <div class="command-label"><span>01 · Merchant Risk Twin</span><strong id="twin-status">—</strong></div>
+                <div class="twin-score-row">
+                  <div class="deviation-score"><span id="twin-deviation">0</span><small>behavioural deviation</small></div>
+                  <p id="twin-explanation">Waiting for merchant evidence.</p>
+                </div>
+                <div class="twin-comparison">
+                  <div><span>Baseline risk</span><strong id="baseline-risk">—</strong><i><b id="baseline-risk-bar"></b></i></div>
+                  <div><span>Live risk</span><strong id="observed-risk">—</strong><i><b id="observed-risk-bar"></b></i></div>
+                  <div><span>Expected velocity</span><strong id="baseline-velocity">—</strong></div>
+                  <div><span>Live velocity</span><strong id="observed-velocity">—</strong></div>
+                </div>
+              </div>
+
+              <div class="constellation-panel command-panel">
+                <div class="command-label"><span>02 · Fraud Constellation</span><strong id="constellation-summary">—</strong></div>
+                <svg id="constellation-svg" viewBox="0 0 640 340" role="img" aria-label="Privacy-safe relationship graph"></svg>
+                <div class="constellation-legend"><span><i class="merchant-dot"></i>Merchant</span><span><i class="transaction-dot"></i>Payment</span><span><i class="hub-dot"></i>Shared hub</span></div>
+              </div>
+            </div>
+
+            <div class="intelligence-grid">
+              <div class="dna-panel command-panel">
+                <div class="command-label"><span>03 · Attack DNA</span><strong id="dna-fingerprint">—</strong></div>
+                <div class="dna-identity">
+                  <span id="dna-pattern">No dominant pattern</span>
+                  <strong id="dna-confidence">—</strong>
+                </div>
+                <div class="affinity-bars" id="affinity-bars"></div>
+                <div class="dna-signals" id="dna-signals"></div>
+                <p id="dna-narrative"></p>
+              </div>
+
+              <div class="intervention-panel command-panel">
+                <div class="command-label"><span>04 · Intervention Simulator</span><strong>Compare four futures</strong></div>
+                <div class="intervention-options" id="intervention-options"></div>
+                <p class="projection-note">Model-derived scenario estimates · not production-loss guarantees</p>
+              </div>
+            </div>
+
+            <div class="contract-panel">
+              <div>
+                <span>Proposed temporary action contract</span>
+                <strong id="contract-action">—</strong>
+              </div>
+              <dl>
+                <div><dt>Contract</dt><dd id="contract-id">—</dd></div>
+                <div><dt>Expires</dt><dd id="contract-expiry">—</dd></div>
+                <div><dt>Scope</dt><dd id="contract-scope">—</dd></div>
+                <div><dt>Human gate</dt><dd id="contract-gate">—</dd></div>
+              </dl>
+              <p id="safety-notice">Every action remains reversible and reviewable.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="architecture" id="architecture">
         <div class="container">
           <div class="section-heading light">
-            <div><p class="eyebrow">Act III · Respond / Bounded by design</p><h2>From payment event<br />to <em>auditable action.</em></h2></div>
+            <div><p class="eyebrow">Act IV · Trust / Bounded by design</p><h2>From payment event<br />to <em>auditable action.</em></h2></div>
             <p>The model advises; policy gates the response; a human owns the highest-impact decision.</p>
           </div>
           <div class="flow">
@@ -172,7 +264,7 @@
             <i>→</i>
             <article><b>02</b><span class="flow-icon">◫</span><h3>Risk model</h3><p>Calibrated probability using an explainable logistic model.</p></article>
             <i>→</i>
-            <article><b>03</b><span class="flow-icon">⌁</span><h3>Spike sentinel</h3><p>Merchant-level flagged rate with a minimum-volume guard.</p></article>
+            <article><b>03</b><span class="flow-icon">⌁</span><h3>Risk twin</h3><p>Merchant baseline, attack DNA and relationship evidence.</p></article>
             <i>→</i>
             <article><b>04</b><span class="flow-icon">✓</span><h3>Policy gate</h3><p>Allow, monitor, step-up or hold—never permanent auto-block.</p></article>
             <i>→</i>
@@ -183,6 +275,6 @@
     </main>
 
     <footer><div class="container"><span>RiskLens AI · Defence-only prototype</span><span>Built for transparent payment risk decisions</span></div></footer>
-    <script src="/static/app.js?v=cinematic-2" defer></script>
+    <script src="/static/app.js?v=cinematic-3" defer></script>
   </body>
 </html>

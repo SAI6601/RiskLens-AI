@@ -77,7 +77,7 @@ def score_batch(request: BatchRequest) -> BatchResponse:
     for decision in decisions:
         app.state.audit.append(decision.model_dump())
     spikes = app.state.engine.detect_merchant_spikes(decisions)
-    active_threshold = 0.55 if request.simulate_model_failure else app.state.engine.threshold
+    active_threshold = 0.40 if request.simulate_model_failure else app.state.engine.threshold
     incidents = app.state.incidents.analyze(
         request.transactions,
         decisions,
