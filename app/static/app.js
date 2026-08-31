@@ -128,6 +128,7 @@ function renderDecision(decision) {
   content.classList.remove("hidden");
   if (!reducedMotion()) replayClass(content, "is-entering");
   const score = decision.risk_score;
+  setIrisMood(score >= decision.threshold ? "alert" : "calm");
   const color = score >= .82 ? "#ff6c72" : score >= decision.threshold ? "#ffb86b" : "#48e4c2";
   animateGauge(score, color);
   document.querySelector("#risk-band").textContent = `${decision.risk_band} risk`;
@@ -255,6 +256,7 @@ function renderIncident(data) {
   replayClass(consolePanel, "is-replaying");
 
   const degraded = data.system_mode === "degraded";
+  setIrisMood(degraded ? "degraded" : incident.risk_twin.status === "attack" ? "alert" : "calm");
   const mode = document.querySelector("#system-mode");
   mode.classList.toggle("is-degraded", degraded);
   mode.innerHTML = `<i></i> ${degraded ? "Degraded safety mode" : "Primary model online"}`;
@@ -303,6 +305,7 @@ function renderIncident(data) {
   document.querySelector("#contract-gate").textContent = contract.human_gate_required ? "Required" : "Policy gated";
   document.querySelector("#safety-notice").textContent = data.safety_notice;
   replayIncidentTimeline();
+  refreshIrisGuide();
 }
 
 async function analyzeBatch(simulateFailure = false) {
@@ -352,6 +355,156 @@ document.querySelectorAll(".scenario-tab").forEach((tab, index) => {
 document.querySelector("#analyze-button").addEventListener("click", analyze);
 document.querySelector("#batch-button").addEventListener("click", () => analyzeBatch(false));
 document.querySelector("#failure-button").addEventListener("click", () => analyzeBatch(currentSystemMode === "normal"));
+
+const irisSteps = [
+  {
+    kicker: "Orientation",
+    title: "Meet IRIS",
+    message: "I’m the RiskLens intelligence guide. I’ll take you from a merchant signal to a bounded, explainable decision.",
+    target: ".signal-card",
+  },
+  {
+    kicker: "Choose a signal",
+    title: "Start with a payment",
+    message: "Compare a normal payment with card testing, account takeover or an abuse ring. Each scenario changes visible risk evidence.",
+    target: ".scenario-tabs",
+  },
+  {
+    kicker: "Inspect evidence",
+    title: "Challenge the score",
+    message: "Analyze the transaction. RiskLens exposes its threshold, confidence, ranked reason codes and bounded recommendation.",
+    target: "#analyze-button",
+  },
+  {
+    kicker: "Reveal the campaign",
+    title: "Watch an attack form",
+    message: "Launch the merchant replay. One flag is not enough—RiskLens waits for merchant-level evidence before declaring an incident.",
+    target: "#batch-button",
+  },
+  {
+    kicker: "Connect evidence",
+    title: "Follow the constellation",
+    message: "Shared pseudonymous devices and networks connect payments that may look harmless when viewed separately.",
+    target: ".constellation-panel",
+    fallback: ".incident-heading",
+  },
+  {
+    kicker: "Compare outcomes",
+    title: "Test four futures",
+    message: "Compare loss prevented, residual exposure, customer friction and analyst workload before choosing a response.",
+    target: ".intervention-panel",
+    fallback: ".incident-heading",
+  },
+  {
+    kicker: "Verify resilience",
+    title: "Make RiskLens fail safely",
+    message: "Simulate a model failure. Automation switches off, fallback rules are labelled and the highest-impact action becomes human-gated.",
+    target: "#failure-button",
+  },
+];
+
+const irisStorageKey = "risklens-iris-guide-seen-v1";
+let irisStepIndex = 0;
+let irisActiveTarget = null;
+
+function setIrisMood(mood) {
+  const guide = document.querySelector("#iris-guide");
+  if (guide) guide.dataset.mood = mood;
+}
+
+function irisHasBeenSeen() {
+  try { return window.localStorage.getItem(irisStorageKey) === "true"; }
+  catch (error) { return false; }
+}
+
+function rememberIrisVisit() {
+  try { window.localStorage.setItem(irisStorageKey, "true"); }
+  catch (error) { /* The guide still works when storage is unavailable. */ }
+}
+
+function clearIrisTarget() {
+  if (irisActiveTarget) irisActiveTarget.classList.remove("iris-target");
+  irisActiveTarget = null;
+}
+
+function resolveIrisTarget(step) {
+  const requested = document.querySelector(step.target);
+  if (requested && requested.getClientRects().length) return requested;
+  return step.fallback ? document.querySelector(step.fallback) : requested;
+}
+
+function renderIrisStep(scrollToTarget = true) {
+  const step = irisSteps[irisStepIndex];
+  const guide = document.querySelector("#iris-guide");
+  document.querySelector("#iris-step-label").textContent = `${step.kicker} · ${String(irisStepIndex + 1).padStart(2, "0")}`;
+  document.querySelector("#iris-title").textContent = step.title;
+  document.querySelector("#iris-message").textContent = step.message;
+  document.querySelector("#iris-back").disabled = irisStepIndex === 0;
+  document.querySelector("#iris-next").innerHTML = `${irisStepIndex === 0 ? "Begin tour" : irisStepIndex === irisSteps.length - 1 ? "Finish" : "Next"} <span>→</span>`;
+  document.querySelector("#iris-progress").innerHTML = irisSteps.map((_, index) => `<i class="${index < irisStepIndex ? "is-complete" : index === irisStepIndex ? "is-active" : ""}"></i>`).join("");
+
+  clearIrisTarget();
+  irisActiveTarget = resolveIrisTarget(step);
+  if (!irisActiveTarget) return;
+  irisActiveTarget.classList.add("iris-target");
+  const targetRect = irisActiveTarget.getBoundingClientRect();
+  const targetCenter = targetRect.left + targetRect.width / 2;
+  guide.classList.toggle("is-left", window.innerWidth > 720 && targetCenter > window.innerWidth * 0.58);
+  if (scrollToTarget) {
+    irisActiveTarget.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "center" });
+  }
+}
+
+function openIrisGuide(restart = true, scrollToTarget = false) {
+  if (restart) irisStepIndex = 0;
+  const guide = document.querySelector("#iris-guide");
+  guide.classList.add("is-open");
+  document.querySelector("#iris-panel").setAttribute("aria-hidden", "false");
+  document.querySelector("#iris-trigger").setAttribute("aria-expanded", "true");
+  renderIrisStep(scrollToTarget);
+}
+
+function closeIrisGuide(markSeen = true) {
+  const guide = document.querySelector("#iris-guide");
+  guide.classList.remove("is-open", "is-left");
+  document.querySelector("#iris-panel").setAttribute("aria-hidden", "true");
+  document.querySelector("#iris-trigger").setAttribute("aria-expanded", "false");
+  clearIrisTarget();
+  if (markSeen) rememberIrisVisit();
+}
+
+function refreshIrisGuide() {
+  if (document.querySelector("#iris-guide")?.classList.contains("is-open")) renderIrisStep(false);
+}
+
+function initializeIrisGuide() {
+  document.querySelector("#iris-trigger").addEventListener("click", () => {
+    const open = document.querySelector("#iris-guide").classList.contains("is-open");
+    if (open) closeIrisGuide();
+    else openIrisGuide(true, false);
+  });
+  document.querySelector("#iris-close").addEventListener("click", () => closeIrisGuide());
+  document.querySelector("#iris-dismiss").addEventListener("click", () => closeIrisGuide());
+  document.querySelector("#iris-back").addEventListener("click", () => {
+    if (irisStepIndex === 0) return;
+    irisStepIndex -= 1;
+    renderIrisStep();
+  });
+  document.querySelector("#iris-next").addEventListener("click", () => {
+    if (irisStepIndex === irisSteps.length - 1) {
+      closeIrisGuide();
+      return;
+    }
+    irisStepIndex += 1;
+    renderIrisStep();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && document.querySelector("#iris-guide").classList.contains("is-open")) closeIrisGuide();
+  });
+  if (!irisHasBeenSeen()) {
+    window.setTimeout(() => openIrisGuide(true, false), reducedMotion() ? 1350 : 1900);
+  }
+}
 
 function initializeExperience() {
   const boot = document.querySelector(".boot-sequence");
@@ -408,3 +561,4 @@ function initializeExperience() {
 renderPreview();
 loadMetrics();
 initializeExperience();
+initializeIrisGuide();

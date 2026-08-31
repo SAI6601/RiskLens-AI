@@ -45,7 +45,7 @@ The report also exposes false-positive review cost, caught fraud amount, missed 
 
 ## Product experience
 
-The dashboard is structured as a product-film journey: merchant pulse → explainable transaction → live incident replay → bounded action contract. The incident room animates the risk twin, relationship constellation, Attack DNA and four intervention futures. Motion remains functional rather than decorative and collapses under the operating system's `prefers-reduced-motion` accessibility setting.
+The dashboard is structured as a product-film journey: merchant pulse → explainable transaction → live incident replay → bounded action contract. The incident room animates the risk twin, relationship constellation, Attack DNA and four intervention futures. A dismissible seven-step IRIS intelligence guide introduces first-time reviewers to the real controls, adapts its mood to live system state and moves away from the element it is highlighting. Motion remains functional rather than decorative and collapses under the operating system's `prefers-reduced-motion` accessibility setting.
 
 ## Architecture
 

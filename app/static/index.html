@@ -6,7 +6,7 @@
     <meta name="description" content="RiskLens AI — a merchant risk twin that detects attack DNA and tests bounded interventions." />
     <title>RiskLens AI · Payment Risk Manager</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23050c13'/%3E%3Cpath d='M18 40V28M31 40V18M44 40V24' stroke='%2348e4c2' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E" />
-    <link rel="stylesheet" href="/static/styles.css?v=cinematic-3" />
+    <link rel="stylesheet" href="/static/styles.css?v=cinematic-5" />
   </head>
   <body>
     <div class="boot-sequence" aria-hidden="true">
@@ -276,6 +276,38 @@
     </main>
 
     <footer><div class="container"><span>RiskLens AI · Defence-only prototype</span><span>Built for transparent payment risk decisions</span></div></footer>
-    <script src="/static/app.js?v=cinematic-3" defer></script>
+
+    <aside class="iris-guide" id="iris-guide" data-mood="calm" aria-label="IRIS product guide">
+      <section class="iris-panel" id="iris-panel" role="dialog" aria-labelledby="iris-title" aria-hidden="true">
+        <button class="iris-close" id="iris-close" aria-label="Close IRIS guide">×</button>
+        <div class="iris-panel-head">
+          <span class="iris-mini-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <div><strong>IRIS</strong><span>RiskLens intelligence guide</span></div>
+          <b>ONLINE</b>
+        </div>
+        <p class="iris-step-label" id="iris-step-label">Orientation · 01</p>
+        <h2 id="iris-title">Meet IRIS</h2>
+        <p class="iris-message" id="iris-message" aria-live="polite">I’ll guide you from a merchant signal to a bounded risk decision.</p>
+        <div class="iris-progress" id="iris-progress" aria-label="Guide progress"></div>
+        <div class="iris-actions">
+          <button class="iris-text-action" id="iris-back">Back</button>
+          <button class="iris-text-action" id="iris-dismiss">Dismiss</button>
+          <button class="iris-next" id="iris-next">Begin tour <span>→</span></button>
+        </div>
+      </section>
+
+      <button class="iris-trigger" id="iris-trigger" aria-label="Open IRIS product guide" aria-expanded="false" aria-controls="iris-panel">
+        <span class="iris-orbit" aria-hidden="true"></span>
+        <span class="iris-character" aria-hidden="true">
+          <i class="iris-antenna"></i>
+          <i class="iris-ear iris-ear-left"></i>
+          <span class="iris-face"><i class="iris-eye iris-eye-left"></i><i class="iris-eye iris-eye-right"></i><span class="iris-voice"><b></b><b></b><b></b></span></span>
+          <i class="iris-ear iris-ear-right"></i>
+        </span>
+        <span class="iris-trigger-label">Guide me</span>
+      </button>
+    </aside>
+
+    <script src="/static/app.js?v=cinematic-5" defer></script>
   </body>
 </html>
