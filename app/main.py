@@ -84,6 +84,8 @@ def score_batch(request: BatchRequest) -> BatchResponse:
         active_threshold,
         system_mode=system_mode,
     )
+    for incident in incidents:
+        app.state.audit.append_incident(incident.model_dump(), system_mode)
     flagged = sum(decision.risk_score >= active_threshold for decision in decisions)
     return BatchResponse(
         decisions=decisions,

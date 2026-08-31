@@ -1,113 +1,110 @@
 # RiskLens AI presentation storyboard
 
-The presentation should feel like a short product film with one clear argument:
+The presentation is one incident unfolding in real time:
 
-> RiskLens turns a confusing fraud signal into explainable evidence and a bounded human-controlled action.
+> A normal merchant heartbeat changes, connected evidence reveals a campaign, and RiskLens tests the safest bounded response.
 
-Do not present the repository as a list of technologies. Present one decision journey in three acts.
+Do not present a checklist of technologies. Present a decision journey.
 
 ## Visual language
 
-| Colour | Meaning in the presentation |
+| Colour | Meaning |
 |---|---|
-| Obsidian/navy | Uncertainty, risk and the operating environment |
+| Obsidian/navy | Uncertainty and the live operating environment |
 | Luminous mint | Verified intelligence and healthy system state |
-| Electric blue | Model evidence and technical depth |
-| Amber | Reversible friction such as step-up authentication |
+| Electric blue | Model and relationship evidence |
+| Amber | Reversible friction and shared suspicious hubs |
 | Coral | Critical risk requiring human review |
-| Warm paper | Clarity, measurement and honest evidence |
+| Warm paper | Measurement and honest evaluation |
 
-This colour discipline is important. Never use coral merely as decoration; it should retain its critical-risk meaning.
+Never use amber or coral only as decoration; their risk meaning must remain consistent.
 
 ## Five-minute shot plan
 
 ### 0:00–0:12 — Cold open
 
-**Screen:** Reload the dashboard. Let the `RISK / LENS` opening and Signal → Evidence → Action sequence play without moving the cursor.
+**Screen:** Reload. Let `RISK / LENS` and Signal → Evidence → Action play with the cursor still.
 
-**Voice:** Begin after the wordmark appears: “A fraud score is easy. A decision you can explain, measure and safely act on is much harder.”
+**Voice:** “A fraud score is easy. Recognising that a merchant is entering a coordinated attack—and choosing the safest response—is much harder.”
 
-**Purpose:** Establish confidence before showing any interface controls.
+### 0:12–0:45 — Product promise
 
-### 0:12–0:42 — Act I: Detect
+**Screen:** Hold on the hero and animated merchant pulse.
 
-**Screen:** Hold on the dark hero and animated merchant pulse.
+**Voice:** Introduce the Merchant Risk Twin and the three promises: human-gated, attack-aware and measured.
 
-**Voice:** “RiskLens AI is an explainable fraud-spike sentinel. It detects suspicious payment events and merchant-level bursts, then recommends a bounded response without permanently auto-blocking an account.”
+### 0:45–1:08 — Honest evidence
 
-Pause briefly on the three product promises: Human-gated, Auditable, Measured.
+**Screen:** Click **Evidence** and allow metrics to finish counting.
 
-### 0:42–1:10 — Evidence before demo
+**Voice:** State the four held-out metrics and say “chronological synthetic held-out test” clearly.
 
-**Screen:** Click **Evidence**. Let the four metrics count up.
+### 1:08–1:34 — Explain one payment
 
-**Voice:** “Before the demo, these are the frozen held-out results—not cherry-picked examples. Precision is 75.6%, recall 87.9%, F1 81.3%, and the false-positive rate is 2.4% on deterministic synthetic data.”
+**Screen:** Analyze **Normal payment**, then **Card-testing burst**.
 
-Say “synthetic” clearly. That honesty creates trust.
+**Voice:** Contrast ordinary behaviour with velocity, repeated failures and device novelty. Pause for the reason cards.
 
-### 1:10–2:15 — Single-decision contrast
+### 1:34–2:10 — Risk Twin activation
 
-**Screen:** Click **Live assessment**.
+**Screen:** Click **Launch the live merchant attack replay**. Do not move the cursor during the automatic transition.
 
-1. Analyze **Normal payment**.
-2. Switch to **Card-testing burst** and analyze again.
+**Voice:** Explain the baseline-to-live change. Point out minimum-volume protection only once.
 
-**Voice:** “The normal event stays below the calibrated threshold. The card-testing burst changes three signals: velocity, repeated failures and device novelty. RiskLens does not hide these behind a score—it exposes them as ranked reason codes.”
+### 2:10–2:48 — Relationship reveal
 
-Pause long enough for the gauge and reason cards to finish animating.
+**Screen:** Hold on the animated Fraud Constellation, then scroll to Attack DNA.
 
-### 2:15–2:55 — Merchant-level spike
+**Voice:** Explain how different instruments connect through a shared device and network. State that references are pseudonymous and that pattern affinity is not identity attribution.
 
-**Screen:** Click **Run merchant burst batch instead**.
+### 2:48–3:32 — Compare four futures
 
-**Voice:** “One risky transaction is not automatically a merchant spike. The sentinel requires minimum volume, a minimum flagged count and a flagged-rate threshold. Merchant 007 surfaces at seven of seven; merchant 042 remains normal at zero of seven.”
+**Screen:** Show all four intervention cards, the highlighted recommendation and the temporary action contract.
 
-### 2:55–3:35 — Act III: bounded response
+**Voice:** Compare loss, friction and review workload. Finish on the 15-minute expiry and rollback conditions.
 
-**Screen:** Scroll to the architecture flow.
+### 3:32–4:00 — Failure theatre
 
-**Voice:** “A shared feature contract prevents training-serving mismatch. The interpretable model creates risk evidence. A separate policy gate chooses allow, monitor, step-up or temporary hold. The strongest decision remains human-reviewed and every result enters a minimized audit trail.”
+**Screen:** Click **Simulate model failure**. Pause on `DEGRADED SAFETY MODE`, `AUTOMATION DISABLED` and `HUMAN GATE REQUIRED`. Restore the model.
 
-### 3:35–4:25 — Why the model earns trust
+**Voice:** “A responsible risk system must fail safely, not confidently.”
 
-**Screen:** Briefly show the README comparison or `metrics.json`.
+### 4:00–4:35 — Architecture and evidence
 
-**Voice:** “The model is compared with a transparent rule baseline. It improves F1 from 52.2% to 81.3% and reduces the prototype cost estimate from approximately ₹23.2 thousand to ₹8.3 thousand under documented assumptions. The operating threshold was selected only on validation data and then frozen.”
+**Screen:** Briefly show the architecture flow or README model-versus-rule comparison.
 
-### 4:25–5:00 — Honest close
+**Voice:** Describe the shared feature contract, interpretable classifier, incident layer, bounded policy and minimized audit record. Avoid a code tour.
 
-**Screen:** Return to the hero or end on the architecture’s Audit Trail card.
+### 4:35–5:00 — Honest close
 
-**Voice:** “These are synthetic-data results, not production claims. The next step is evaluation on approved payment data, drift monitoring and analyst feedback. RiskLens demonstrates the principle I would bring to Razorpay: detect quickly, explain clearly, act within limits, and keep a human accountable for the highest-impact decision.”
+**Screen:** End on the action contract or hero, not an unrelated thank-you slide.
 
-End cleanly. Do not add an unrelated thank-you slide.
+**Voice:** State the synthetic-data boundary and production extension path. End with: “Understand the attack, explain the evidence, compare the consequences and act only within visible limits.”
 
 ## Recording setup
 
-- Record at 1440×900 or 1920×1080, 100% browser zoom and at least 30 fps.
-- Use a clean browser window with bookmarks, notifications and unrelated tabs hidden.
-- Keep the cursor still unless selecting a control. Never circle UI elements repeatedly.
-- Use one continuous product walkthrough with at most three purposeful cuts.
-- Record voice separately if the room is noisy, then align it with the visual pauses.
+- Record at 1920×1080 or 1440×900, 100% browser zoom and at least 30 fps.
+- Hide notifications, bookmarks and unrelated tabs.
+- Use one continuous walkthrough with no more than three purposeful cuts.
+- Keep the cursor still during automatic motion and move it directly between controls.
 - Speak at approximately 125–135 words per minute.
-- Leave 0.5–1 second after every important metric or decision so reviewers can read it.
-- Export at 1080p; verify that small reason-code and metric text remains legible.
+- Leave one second after the Risk Twin, Attack DNA, recommendation and degraded-mode state.
+- Verify the small graph labels and intervention numbers remain legible after export.
 
-## Delivery style
+## Delivery rules
 
-- Sound calm and technically certain, not excited or rushed.
-- Lead with the problem and decision safety—not the technology stack.
-- Use “the prototype achieved” rather than “our system guarantees.”
-- Say “synthetic held-out test” every time you state performance.
-- Explain one trade-off: higher recall catches more fraud but can increase customer friction.
-- End with limitations and the production extension path. Honest boundaries make the earlier claims stronger.
+- Lead with the merchant incident—not the framework names.
+- Say “the prototype achieved,” never “the system guarantees.”
+- Say “heuristic affinity,” not “82% certainly card testing.”
+- Call intervention values “scenario estimates under documented assumptions.”
+- Explain one trade-off: containment reduces loss but increases customer friction or review load.
+- Sound calm and technically certain; do not rush the graceful-failure moment.
 
 ## Avoid
 
-- No background music louder than the voice.
-- No hacker imagery, payment-card graphics or red warning effects used only for drama.
-- No unsupported claim that RiskLens prevents all fraud.
-- No long code walkthrough.
-- No reading the README line by line.
-- No unexplained acronym sequence.
-
+- No loud background music or generic hacker imagery.
+- No claim that RiskLens prevents all fraud.
+- No claim that synthetic metrics represent Razorpay traffic.
+- No long code walkthrough or README reading.
+- No statement that Attack DNA identifies a person or criminal group.
+- No animation without a product meaning.

@@ -4,17 +4,15 @@
 
 ```mermaid
 flowchart TD
-    A[Analyst selects or submits a transaction] --> B[RiskLens validates every field]
-    B --> C[Model estimates fraud risk]
-    C --> D[Analyst receives score and top reasons]
-    D --> E{Policy gate}
-    E -->|Low| F[Allow]
-    E -->|Medium| G[Allow and monitor]
-    E -->|High| H[Step-up authentication]
-    E -->|Critical| I[Hold for human review]
-    F --> J[Record audit evidence]
-    G --> J
-    H --> J
+    A[Merchant payment window arrives] --> B[Validate fields and pseudonymous references]
+    B --> C[Score and explain each payment]
+    C --> D[Compare live behaviour with merchant baseline]
+    D --> E[Resolve Attack DNA and shared relationship hubs]
+    E --> F[Simulate four bounded interventions]
+    F --> G{Evidence and confidence gate}
+    G -->|Sufficient| H[Propose temporary action contract]
+    G -->|Uncertain or degraded| I[Require analyst review]
+    H --> J[Record minimized audit evidence]
     I --> J
 ```
 
@@ -31,11 +29,15 @@ flowchart LR
     G --> H[Top three positive reason codes]
     F --> I[Action thresholds]
     F --> J[Per-merchant aggregation]
-    J --> K[Volume + flagged-rate guard]
-    H --> L[Decision response]
-    I --> L
-    K --> M[Merchant spike response]
-    L --> N[Minimal append-only audit record]
+    J --> K[Merchant Risk Twin]
+    K --> L[Attack DNA affinities]
+    K --> M[Relationship constellation]
+    L --> N[Intervention simulator]
+    M --> N
+    H --> N
+    I --> N
+    N --> O[Expiry + scope + rollback contract]
+    O --> P[Minimal append-only audit record]
 ```
 
 ## Component responsibilities
@@ -46,7 +48,8 @@ flowchart LR
 | `features.py` | Keep training and inference identical | One shared ordered feature contract |
 | `training.py` | Train, calibrate and freeze evidence | Chronological split; validation-only threshold |
 | `risk_engine.py` | Score, explain and apply action policy | Interpretable contributions and bounded actions |
-| `audit.py` | Preserve review evidence | Excludes raw feature values and credentials |
+| `incident_engine.py` | Convert scores into merchant incident intelligence | Transparent baseline deviation, pattern affinities, graph hubs and scenario costs |
+| `audit.py` | Preserve decision and proposed-contract evidence | Excludes raw features and links records with SHA-256 hashes |
 | `main.py` | Expose dashboard and APIs | Max 500 transactions per batch |
 | dashboard | Demonstrate normal and fraud scenarios | Calls the same public APIs as any client |
 
@@ -67,6 +70,10 @@ The calibrated fraud threshold is currently `0.475`. It was selected on validati
 - Null model inputs are rejected rather than silently imputed.
 - Batch size is bounded to 500 transactions.
 - A merchant spike requires at least 5 transactions, 3 flags and a 30% flagged rate.
+- Fewer than 5 transactions produces `insufficient_evidence`, never an attack claim.
+- Near-boundary or outlying inputs reduce the automation-eligibility heuristic.
+- A simulated model outage switches to labelled fallback rules and disables automation.
+- High-impact or degraded action contracts require a human gate and always expire.
 - Missing model artifacts are reproducibly regenerated at application startup.
 - Model-feature mismatch stops startup instead of allowing silent scoring drift.
 - The UI exposes API failure messages and never fabricates a decision.
@@ -74,4 +81,3 @@ The calibrated fraud threshold is currently `0.475`. It was selected on validati
 ## Production extension path
 
 The prototype intentionally stops short of production deployment. A production design would add authenticated service-to-service access, encrypted event transport, an online feature store, drift monitoring, analyst feedback labels, controlled retraining, model registry approvals and jurisdiction-specific retention controls.
-

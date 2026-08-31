@@ -1,8 +1,8 @@
 # RiskLens AI
 
-**Explainable payment fraud-spike detection with bounded, auditable interventions.**
+**A merchant risk twin that detects attack DNA and tests bounded, auditable interventions.**
 
-RiskLens AI is a defence-only prototype for the **Razorpay AI Buildathon — Track 2: AI Risk Manager**. It scores individual payment events, detects merchant-level fraud bursts, explains the strongest risk signals, and recommends a bounded response:
+RiskLens AI is a defence-only prototype for the **Razorpay AI Buildathon — Track 2: AI Risk Manager**. It scores payment events, compares live merchant behaviour with a transparent baseline, fingerprints the strongest attack pattern, reveals privacy-safe relationship hubs, and compares bounded responses before proposing an action:
 
 - `allow`
 - `allow_and_monitor`
@@ -34,16 +34,18 @@ The report also exposes false-positive review cost, caught fraud amount, missed 
 
 ## Why this is more than a fraud score
 
-1. **Explainable:** every decision returns ranked reason codes based on local model contributions.
-2. **Cost-aware:** the threshold minimizes estimated business cost under a recall floor, using validation data only.
-3. **Spike-aware:** batch scoring surfaces merchant-level bursts only after minimum volume and flagged-count guards.
-4. **Bounded:** model output passes through an explicit policy gate; it cannot permanently block an account.
-5. **Auditable:** a privacy-minimized JSONL record stores transaction ID, merchant ID, score, action, reasons and model version—never raw payment credentials.
-6. **Honest:** limitations and synthetic-data boundaries are visible in both the UI and model card.
+1. **Merchant Risk Twin:** compares the current risk, velocity, flagged rate and device novelty with a documented merchant baseline.
+2. **Attack DNA:** exposes heuristic affinities for card testing, account takeover and abuse-ring behaviour without claiming attacker identity.
+3. **Fraud Constellation:** connects pseudonymous device, instrument, customer and network references to surface shared hubs.
+4. **Intervention Simulator:** compares projected residual loss, loss prevented, friction exposure and analyst workload across four responses.
+5. **Honest-AI gate:** reduces automation eligibility near decision boundaries or on unfamiliar feature values.
+6. **Graceful failure:** a demonstrable degraded mode uses transparent fallback rules, disables automation and human-gates high-impact actions.
+7. **Bounded:** every proposed intervention has an expiry, transaction limit and rollback conditions; permanent auto-blocking is outside the design.
+8. **Auditable:** privacy-minimized transaction and incident-contract records form a lightweight SHA-256 hash chain—never storing raw card credentials.
 
 ## Product experience
 
-The dashboard uses an original motion system to make the risk workflow easier to follow: a short signal-to-evidence opening sequence, animated merchant pulse, scroll-triggered metric counts, staged reason-code reveals and an easing risk gauge. Motion remains functional rather than decorative and automatically collapses under the operating system's `prefers-reduced-motion` accessibility setting.
+The dashboard is structured as a product-film journey: merchant pulse → explainable transaction → live incident replay → bounded action contract. The incident room animates the risk twin, relationship constellation, Attack DNA and four intervention futures. Motion remains functional rather than decorative and collapses under the operating system's `prefers-reduced-motion` accessibility setting.
 
 ## Architecture
 
@@ -53,12 +55,14 @@ flowchart LR
     B --> C[Scaled logistic risk model]
     C --> D[Risk probability]
     D --> E[Reason-code generator]
-    D --> F[Merchant spike sentinel]
-    E --> G[Bounded policy gate]
-    F --> G
-    G --> H[Allow / Monitor / Step-up / Hold]
-    H --> I[Privacy-minimized audit trail]
-    H --> J[Human analyst for high-impact decision]
+    D --> F[Merchant Risk Twin]
+    F --> G[Attack DNA + relationship constellation]
+    G --> H[Intervention simulator]
+    E --> H
+    H --> I[Temporary action contract]
+    I --> J[Allow / Monitor / Step-up / Hold]
+    J --> K[Privacy-minimized audit trail]
+    J --> L[Human analyst when gated]
 ```
 
 Full design notes: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
@@ -89,12 +93,16 @@ The application trains a model automatically at startup when no artifact exists,
 python -m unittest discover -s tests -v
 ```
 
-The test suite covers:
+The 11-test suite covers:
 
 - deterministic data generation;
 - chronological split boundaries;
 - low-risk and card-testing decisions;
 - minimum-volume spike guards;
+- Merchant Risk Twin attack and insufficient-evidence states;
+- Attack DNA and privacy-safe relationship hubs;
+- degraded-mode automation shutdown and human-gated contracts;
+- hash-linked audit integrity;
 - audit-data minimization;
 - API health, scoring, metrics and validation failures.
 
@@ -123,7 +131,9 @@ The test suite covers:
 }
 ```
 
-The response contains the calibrated risk score, threshold, risk band, recommended action, human-review flag, model version and ranked explanations.
+The response contains the calibrated risk score, threshold, risk band, recommended action, decision source, confidence gate, human-review flag, model version and ranked explanations.
+
+`POST /api/batch` adds merchant incidents containing the Risk Twin, Attack DNA, Fraud Constellation, intervention comparison and a proposed temporary action contract. Set `simulate_model_failure` to `true` to exercise the documented fallback path; fallback decisions are explicitly labelled and are never automation-eligible.
 
 ## Data and model
 
@@ -141,7 +151,7 @@ Read [`docs/MODEL_CARD.md`](docs/MODEL_CARD.md) before interpreting the metrics.
 ## Repository map
 
 ```text
-app/                    FastAPI service, decision engine, audit store and UI
+app/                    FastAPI service, transaction and incident engines, audit store and UI
 src/risklens/           Data generator, feature contract, training and evaluation
 scripts/                Reproducible training and run helpers
 tests/                  Standard-library unittest suite

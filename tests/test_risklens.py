@@ -160,6 +160,24 @@ class AuditTests(unittest.TestCase):
         record = store.recent(1)[0]
         self.assertNotIn("amount", record)
         self.assertEqual(record["reason_codes"], ["VELOCITY_SPIKE"])
+        self.assertEqual(record["event_type"], "transaction_decision")
+        self.assertIn("record_hash", record)
+
+    def test_audit_records_are_hash_linked(self) -> None:
+        store = AuditStore(ROOT / "data" / "audit" / "test_hash_chain.jsonl")
+        record = {
+            "transaction_id": "txn_hash",
+            "merchant_id": "merchant_hash",
+            "risk_score": 0.4,
+            "risk_band": "medium",
+            "recommended_action": "allow_and_monitor",
+            "reasons": [{"code": "VELOCITY_SPIKE"}],
+            "model_version": "test",
+        }
+        store.append(record)
+        store.append({**record, "transaction_id": "txn_hash_2"})
+        newest, previous = store.recent(2)
+        self.assertEqual(newest["previous_hash"], previous["record_hash"])
 
 
 class ApiTests(unittest.TestCase):

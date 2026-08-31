@@ -73,6 +73,17 @@ The estimated-cost comparison depends on the explicit prototype assumptions abov
 
 For each prediction, standardized feature values are multiplied by their logistic coefficients. The three strongest positive contributions become human-readable reason codes. This explains the model's local evidence but does not prove causality.
 
+## Incident-intelligence layer
+
+The Merchant Risk Twin, Attack DNA, Fraud Constellation and Intervention Simulator are transparent decision-support logic around the transaction model; they are not additional trained models.
+
+- Risk Twin deviation combines flagged-rate lift, average-risk lift, velocity, device novelty and relationship strength.
+- Attack DNA values are heuristic pattern affinities, not calibrated probabilities or attacker attribution.
+- Relationship analysis accepts only optional pseudonymous references and marks a shared hub after three linked transactions.
+- Intervention projections use the model score and documented review/loss assumptions. They are comparative scenario estimates, not forecasts of Razorpay losses.
+- Decision confidence is a boundary- and outlier-sensitive heuristic, not a conformal guarantee or confidence interval.
+- Degraded mode uses labelled transparent rules and disables automation eligibility.
+
 ## Known limitations
 
 1. Synthetic distributions do not reproduce real customer, merchant or adversary behaviour.
@@ -80,7 +91,9 @@ For each prediction, standardized feature values are multiplied by their logisti
 3. The model has not been evaluated for subgroup fairness because no demographic variables exist in the synthetic data.
 4. Probability calibration has not been tested on external data.
 5. Merchant spike thresholds are transparent policy rules, not statistically fitted baselines.
-6. Audit persistence is a local JSONL demonstration, not a tamper-evident production ledger.
+6. Audit persistence is a local hash-linked JSONL demonstration. It can reveal edits after the fact but is not an externally anchored, access-controlled production ledger.
+7. Merchant baselines are prototype expectations supplied or derived from synthetic features, not learned production merchant profiles.
+8. Attack affinities and intervention projections have not been validated on external incidents.
 
 ## Monitoring required before production
 
