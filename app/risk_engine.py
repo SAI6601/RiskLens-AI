@@ -85,6 +85,16 @@ class RiskEngine:
             return "high", "step_up_auth"
         return "critical", "hold_for_review"
 
+    def _decision_confidence(self, frame: pd.DataFrame, row_index: int, score: float) -> float:
+        """Transparent heuristic certainty, not a calibrated confidence interval."""
+        scaler = self.model.named_steps["scale"]
+        standardized = scaler.transform(prepare_features(frame.iloc[[row_index]]))[0]
+        outlier_penalty = min(float(np.maximum(np.abs(standardized) - 3.0, 0).sum()) / 12.0, 0.45)
+        action_boundaries = [0.20, self.threshold, 0.82]
+        boundary_distance = min(abs(score - boundary) for boundary in action_boundaries)
+        boundary_certainty = min(boundary_distance / 0.20, 1.0)
+        return max(0.05, min(0.98, 0.56 + 0.42 * boundary_certainty - outlier_penalty))
+
     def score_many(self, transactions: list[Transaction]) -> list[RiskDecision]:
         frame = self._frame(transactions)
         probabilities = self.model.predict_proba(prepare_features(frame))[:, 1]
@@ -93,6 +103,7 @@ class RiskEngine:
         for index, (transaction, score) in enumerate(zip(transactions, probabilities, strict=True)):
             score = float(score)
             band, action = self._band_and_action(score)
+            confidence = self._decision_confidence(frame, index, score)
             decisions.append(
                 RiskDecision(
                     transaction_id=transaction.transaction_id,
@@ -104,7 +115,76 @@ class RiskEngine:
                     reasons=self._reason_codes(frame, index),
                     model_version=self.model_version,
                     human_review_required=action == "hold_for_review",
+                    decision_source="risk_model",
+                    decision_confidence=round(confidence, 4),
+                    automation_eligible=confidence >= 0.55 and action != "hold_for_review",
                     disclaimer="Decision support only; never a permanent account block.",
+                )
+            )
+        return decisions
+
+    def score_many_degraded(self, transactions: list[Transaction]) -> list[RiskDecision]:
+        """Conservative transparent fallback used to demonstrate graceful failure."""
+        decisions: list[RiskDecision] = []
+        for transaction in transactions:
+            ratio = transaction.amount / max(transaction.avg_amount_30d, 1.0)
+            signals = {
+                "VELOCITY_SPIKE": min(transaction.tx_count_10m / 20.0, 1.0),
+                "REPEATED_FAILURES": min(transaction.failed_attempts_1h / 8.0, 1.0),
+                "AMOUNT_DEVIATION": min(max(ratio - 1.0, 0.0) / 5.0, 1.0),
+                "SHARED_CARD_CLUSTER": min(transaction.shared_cards_24h / 8.0, 1.0),
+                "SHARED_DEVICE_CLUSTER": min(transaction.shared_devices_24h / 7.0, 1.0),
+                "LOCATION_ANOMALY": min(transaction.distance_from_home_km / 2_000.0, 1.0),
+            }
+            score = min(
+                0.24 * signals["VELOCITY_SPIKE"]
+                + 0.21 * signals["REPEATED_FAILURES"]
+                + 0.17 * signals["AMOUNT_DEVIATION"]
+                + 0.14 * signals["SHARED_CARD_CLUSTER"]
+                + 0.12 * signals["SHARED_DEVICE_CLUSTER"]
+                + 0.07 * signals["LOCATION_ANOMALY"]
+                + 0.05 * transaction.is_new_device,
+                1.0,
+            )
+            if score < 0.25:
+                band, action = "low", "allow_and_monitor"
+            elif score < 0.55:
+                band, action = "medium", "allow_and_monitor"
+            elif score < 0.78:
+                band, action = "high", "step_up_auth"
+            else:
+                band, action = "critical", "hold_for_review"
+            ranked = sorted(signals.items(), key=lambda item: item[1], reverse=True)[:3]
+            reasons = [
+                {
+                    "code": code,
+                    "label": next(label for feature_code, label in REASON_LABELS.values() if feature_code == code),
+                    "contribution": round(value, 4),
+                }
+                for code, value in ranked
+                if value > 0
+            ] or [
+                {
+                    "code": "NO_DOMINANT_RISK_SIGNAL",
+                    "label": "No fallback rule materially increased the estimated risk",
+                    "contribution": 0.0,
+                }
+            ]
+            decisions.append(
+                RiskDecision(
+                    transaction_id=transaction.transaction_id,
+                    merchant_id=transaction.merchant_id,
+                    risk_score=round(score, 6),
+                    threshold=0.55,
+                    risk_band=band,
+                    recommended_action=action,
+                    reasons=reasons,
+                    model_version="risklens-fallback-rules-v1",
+                    human_review_required=action == "hold_for_review",
+                    decision_source="fallback_rules",
+                    decision_confidence=0.35,
+                    automation_eligible=False,
+                    disclaimer="Degraded mode: conservative rules only; automation is disabled and high-risk actions require review.",
                 )
             )
         return decisions
@@ -119,7 +199,8 @@ class RiskEngine:
 
         results: list[MerchantSpike] = []
         for merchant_id, items in grouped.items():
-            flagged = sum(item.risk_score >= self.threshold for item in items)
+            active_threshold = items[0].threshold
+            flagged = sum(item.risk_score >= active_threshold for item in items)
             count = len(items)
             rate = flagged / count
             average = sum(item.risk_score for item in items) / count
@@ -142,4 +223,3 @@ class RiskEngine:
                 )
             )
         return sorted(results, key=lambda item: (item.alert, item.flagged_rate), reverse=True)
-

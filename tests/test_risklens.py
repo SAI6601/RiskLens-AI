@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from app.audit import AuditStore
+from app.incident_engine import IncidentEngine
 from app.main import app
 from app.risk_engine import RiskEngine
 from app.schemas import Transaction
@@ -95,6 +96,51 @@ class RiskEngineTests(unittest.TestCase):
         large = self.engine.score_many([attack.model_copy(update={"transaction_id": f"txn_{i}"}) for i in range(6)])
         self.assertTrue(self.engine.detect_merchant_spikes(large)[0].alert)
 
+    def test_risk_twin_identifies_card_testing_and_relationship_hubs(self) -> None:
+        transactions = [
+            normal_transaction(
+                transaction_id=f"txn_ring_{index}",
+                merchant_id="merchant_007",
+                amount=45 + index * 12,
+                device_age_days=1,
+                failed_attempts_1h=6,
+                tx_count_10m=14 + index,
+                is_new_device=1,
+                device_ref="device_shared_demo",
+                network_ref="network_shared_demo",
+                payment_instrument_ref=f"instrument_{index}",
+            )
+            for index in range(7)
+        ]
+        decisions = self.engine.score_many(transactions)
+        incident = IncidentEngine().analyze(
+            transactions,
+            decisions,
+            self.engine.threshold,
+        )[0]
+
+        self.assertEqual(incident.risk_twin.status, "attack")
+        self.assertEqual(incident.attack_dna.dominant_pattern, "card_testing")
+        self.assertGreaterEqual(incident.constellation.shared_hubs, 2)
+        self.assertEqual(incident.action_contract.action, "step_up_auth")
+        self.assertTrue(any(option.recommended for option in incident.interventions))
+
+    def test_risk_twin_does_not_claim_attack_from_one_payment(self) -> None:
+        transaction = normal_transaction(
+            transaction_id="txn_single_suspicious",
+            failed_attempts_1h=8,
+            tx_count_10m=20,
+            is_new_device=1,
+        )
+        decision = self.engine.score(transaction)
+        incident = IncidentEngine().analyze(
+            [transaction],
+            [decision],
+            self.engine.threshold,
+        )[0]
+        self.assertEqual(incident.risk_twin.status, "insufficient_evidence")
+        self.assertEqual(incident.attack_dna.dominant_pattern, "no_dominant_attack")
+
 
 class AuditTests(unittest.TestCase):
     def test_audit_log_excludes_raw_transaction_features(self) -> None:
@@ -135,6 +181,28 @@ class ApiTests(unittest.TestCase):
             invalid["amount"] = -1
             rejected = client.post("/api/score", json=invalid)
             self.assertEqual(rejected.status_code, 422)
+
+    def test_degraded_batch_disables_automation_and_requires_safe_contract(self) -> None:
+        transactions = [
+            normal_transaction(
+                transaction_id=f"txn_degraded_{index}",
+                merchant_id="merchant_degraded",
+                failed_attempts_1h=8,
+                tx_count_10m=20,
+                is_new_device=1,
+            ).model_dump(mode="json")
+            for index in range(6)
+        ]
+        with TestClient(app) as client:
+            response = client.post(
+                "/api/batch",
+                json={"transactions": transactions, "simulate_model_failure": True},
+            )
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["system_mode"], "degraded")
+        self.assertTrue(all(not item["automation_eligible"] for item in payload["decisions"]))
+        self.assertTrue(payload["incidents"][0]["action_contract"]["human_gate_required"])
 
 
 if __name__ == "__main__":

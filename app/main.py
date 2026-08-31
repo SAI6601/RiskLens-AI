@@ -11,6 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from src.risklens.training import train_and_save
 
 from .audit import AuditStore
+from .incident_engine import IncidentEngine
 from .risk_engine import RiskEngine
 from .schemas import BatchRequest, BatchResponse, RiskDecision, Transaction
 
@@ -27,6 +28,7 @@ async def lifespan(app: FastAPI):
     if not MODEL_PATH.exists() or not METRICS_PATH.exists():
         train_and_save(ARTIFACT_DIR)
     app.state.engine = RiskEngine(MODEL_PATH)
+    app.state.incidents = IncidentEngine()
     app.state.audit = AuditStore(ROOT / "data" / "audit" / "decisions.jsonl")
     yield
 
@@ -47,7 +49,11 @@ def dashboard() -> FileResponse:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "healthy", "model_version": app.state.engine.model_version}
+    return {
+        "status": "healthy",
+        "model_version": app.state.engine.model_version,
+        "incident_intelligence": "ready",
+    }
 
 
 @app.post("/api/score", response_model=RiskDecision)
@@ -62,20 +68,40 @@ def score_transaction(transaction: Transaction) -> RiskDecision:
 
 @app.post("/api/batch", response_model=BatchResponse)
 def score_batch(request: BatchRequest) -> BatchResponse:
-    decisions = app.state.engine.score_many(request.transactions)
+    system_mode = "degraded" if request.simulate_model_failure else "normal"
+    decisions = (
+        app.state.engine.score_many_degraded(request.transactions)
+        if request.simulate_model_failure
+        else app.state.engine.score_many(request.transactions)
+    )
     for decision in decisions:
         app.state.audit.append(decision.model_dump())
     spikes = app.state.engine.detect_merchant_spikes(decisions)
-    flagged = sum(decision.risk_score >= app.state.engine.threshold for decision in decisions)
+    active_threshold = 0.55 if request.simulate_model_failure else app.state.engine.threshold
+    incidents = app.state.incidents.analyze(
+        request.transactions,
+        decisions,
+        active_threshold,
+        system_mode=system_mode,
+    )
+    flagged = sum(decision.risk_score >= active_threshold for decision in decisions)
     return BatchResponse(
         decisions=decisions,
         merchant_spikes=spikes,
+        incidents=incidents,
+        system_mode=system_mode,
+        safety_notice=(
+            "Model unavailable: transparent fallback rules are active, automation is disabled, and high-impact actions are human-gated."
+            if request.simulate_model_failure
+            else "Incident affinities and financial projections are decision-support estimates, not attacker attribution or production guarantees."
+        ),
         summary={
             "transactions": len(decisions),
             "flagged": flagged,
             "held_for_review": sum(item.recommended_action == "hold_for_review" for item in decisions),
             "merchant_spikes": sum(item.alert for item in spikes),
             "average_risk": round(sum(item.risk_score for item in decisions) / len(decisions), 4),
+            "active_incidents": sum(item.risk_twin.status == "attack" for item in incidents),
         },
     )
 
@@ -91,4 +117,3 @@ def metrics() -> dict:
 def recent_audit(limit: int = Query(default=25, ge=1, le=200)) -> dict:
     records = app.state.audit.recent(limit)
     return {"records": records, "count": len(records)}
-

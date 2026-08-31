@@ -25,6 +25,8 @@ class AuditStore:
             "recommended_action": record["recommended_action"],
             "reason_codes": [reason["code"] for reason in record["reasons"]],
             "model_version": record["model_version"],
+            "decision_source": record.get("decision_source", "risk_model"),
+            "automation_eligible": record.get("automation_eligible", False),
         }
         with self._lock:
             with self.path.open("a", encoding="utf-8") as handle:
@@ -37,4 +39,3 @@ class AuditStore:
             lines = self.path.read_text(encoding="utf-8").splitlines()
         records = [json.loads(line) for line in lines[-limit:] if line.strip()]
         return list(reversed(records))
-
