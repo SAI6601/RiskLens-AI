@@ -20,11 +20,11 @@ When the primary model is unavailable, RiskLens visibly enters degraded mode, sw
 
 ## GitHub repository URL
 
-`TO ADD AFTER THE PUBLIC REPOSITORY IS CREATED`
+https://github.com/SAI6601/RiskLens-AI
 
 ## Five-minute pitch video link
 
-`TO ADD AFTER THE VIDEO IS RECORDED AND UPLOADED`
+`PASTE THE PUBLIC YOUTUBE OR GOOGLE DRIVE LINK AFTER UPLOAD`
 
 ## Build challenges and technical obstacles
 
@@ -41,11 +41,11 @@ The final challenge was moving from a score to a responsible incident decision. 
 ## Final-submission checklist
 
 - [ ] Repository is public and cloneable.
-- [ ] README commands work in a clean environment.
-- [ ] Held-out metrics match `artifacts/metrics.json`.
+- [x] README commands work in a clean environment.
+- [x] Held-out metrics match `artifacts/metrics.json`.
 - [ ] Architecture diagram renders correctly on GitHub.
 - [ ] Five-minute video is publicly viewable.
 - [ ] Video demonstrates the Risk Twin, Attack DNA, constellation, intervention comparison and graceful model failure.
 - [ ] Personal details and internship-duration choice are confirmed.
-- [ ] No secrets, private datasets or personal information are committed.
-- [ ] Final form answers are proofread before confirmation.
+- [x] No secrets, private datasets or personal information are committed.
+- [x] Project objective and technical-challenge answers are proofread.

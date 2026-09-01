@@ -83,6 +83,7 @@ Never use amber or coral only as decoration; their risk meaning must remain cons
 
 ## Recording setup
 
+- Dismiss the IRIS first-visit tour once before recording, then reload so the cinematic opening remains unobstructed; the guide stays available from its bottom-corner character.
 - Record at 1920×1080 or 1440×900, 100% browser zoom and at least 30 fps.
 - Hide notifications, bookmarks and unrelated tabs.
 - Use one continuous walkthrough with no more than three purposeful cuts.

@@ -1,5 +1,9 @@
 # RiskLens AI
 
+[![RiskLens CI](https://github.com/SAI6601/RiskLens-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/SAI6601/RiskLens-AI/actions/workflows/ci.yml)
+[![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-48e4c2.svg)](LICENSE)
+
 **A merchant risk twin that detects attack DNA and tests bounded, auditable interventions.**
 
 RiskLens AI is a defence-only prototype for the **Razorpay AI Buildathon — Track 2: AI Risk Manager**. It scores payment events, compares live merchant behaviour with a transparent baseline, fingerprints the strongest attack pattern, reveals privacy-safe relationship hubs, and compares bounded responses before proposing an action:
@@ -68,6 +72,8 @@ flowchart LR
 Full design notes: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Quick start
+
+The reference environment uses Python 3.12 with the reproducible versions pinned in `requirements.txt`.
 
 Windows PowerShell:
 
