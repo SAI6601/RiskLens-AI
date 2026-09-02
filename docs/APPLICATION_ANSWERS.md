@@ -40,7 +40,7 @@ The final challenge was moving from a score to a responsible incident decision. 
 
 ## Final-submission checklist
 
-- [ ] Repository is public and cloneable.
+- [x] Repository is public and cloneable.
 - [x] README commands work in a clean environment.
 - [x] Held-out metrics match `artifacts/metrics.json`.
 - [ ] Architecture diagram renders correctly on GitHub.
