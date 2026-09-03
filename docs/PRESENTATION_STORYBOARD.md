@@ -27,55 +27,55 @@ Never use amber or coral only as decoration; their risk meaning must remain cons
 
 **Voice:** “A fraud score is easy. Recognising that a merchant is entering a coordinated attack—and choosing the safest response—is much harder.”
 
-### 0:12–0:45 — Product promise
+### 0:12–0:42 — Product promise
 
 **Screen:** Hold on the hero and animated merchant pulse.
 
 **Voice:** Introduce the Merchant Risk Twin and the three promises: human-gated, attack-aware and measured.
 
-### 0:45–1:08 — Honest evidence
+### 0:42–1:04 — Honest evidence
 
 **Screen:** Click **Evidence** and allow metrics to finish counting.
 
 **Voice:** State the four held-out metrics and say “chronological synthetic held-out test” clearly.
 
-### 1:08–1:34 — Explain one payment
+### 1:04–1:34 — Explain one payment
 
 **Screen:** Analyze **Normal payment**, then **Card-testing burst**.
 
 **Voice:** Contrast ordinary behaviour with velocity, repeated failures and device novelty. Pause for the reason cards.
 
-### 1:34–2:10 — Risk Twin activation
+### 1:34–2:09 — Risk Twin activation
 
 **Screen:** Click **Launch the live merchant attack replay**. Do not move the cursor during the automatic transition.
 
 **Voice:** Explain the baseline-to-live change. Point out minimum-volume protection only once.
 
-### 2:10–2:48 — Relationship reveal
+### 2:09–2:46 — Relationship reveal
 
 **Screen:** Hold on the animated Fraud Constellation, then scroll to Attack DNA.
 
 **Voice:** Explain how different instruments connect through a shared device and network. State that references are pseudonymous and that pattern affinity is not identity attribution.
 
-### 2:48–3:32 — Compare four futures
+### 2:46–3:30 — Compare four futures
 
 **Screen:** Show all four intervention cards, the highlighted recommendation and the temporary action contract.
 
 **Voice:** Compare loss, friction and review workload. Finish on the 15-minute expiry and rollback conditions.
 
-### 3:32–4:00 — Failure theatre
+### 3:30–3:57 — Failure theatre
 
-**Screen:** Click **Simulate model failure**. Pause on `DEGRADED SAFETY MODE`, `AUTOMATION DISABLED` and `HUMAN GATE REQUIRED`. Restore the model.
+**Screen:** Click **Simulate model failure**. Pause on `DEGRADED SAFETY MODE`, the disabled-automation notice and the `Human gate · Required` field. Restore the model.
 
 **Voice:** “A responsible risk system must fail safely, not confidently.”
 
-### 4:00–4:35 — Architecture and evidence
+### 3:57–4:32 — Architecture and auditability
 
 **Screen:** Briefly show the architecture flow or README model-versus-rule comparison.
 
-**Voice:** Describe the shared feature contract, interpretable classifier, incident layer, bounded policy and minimized audit record. Avoid a code tour.
+**Voice:** Describe the shared feature contract, interpretable classifier, incident layer, bounded policy and hash-linked minimized audit record. Avoid repeating the metrics.
 
-### 4:35–5:00 — Honest close
+### 4:32–4:57 — Honest close
 
 **Screen:** End on the action contract or hero, not an unrelated thank-you slide.
 

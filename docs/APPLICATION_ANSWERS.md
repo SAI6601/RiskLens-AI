@@ -24,7 +24,7 @@ https://github.com/SAI6601/RiskLens-AI
 
 ## Five-minute pitch video link
 
-`PASTE THE PUBLIC YOUTUBE OR GOOGLE DRIVE LINK AFTER UPLOAD`
+https://github.com/SAI6601/RiskLens-AI/releases/download/v1.0-submission/RiskLens_AI_5_Minute_Pitch.mp4
 
 ## Build challenges and technical obstacles
 
@@ -43,9 +43,9 @@ The final challenge was moving from a score to a responsible incident decision. 
 - [x] Repository is public and cloneable.
 - [x] README commands work in a clean environment.
 - [x] Held-out metrics match `artifacts/metrics.json`.
-- [ ] Architecture diagram renders correctly on GitHub.
-- [ ] Five-minute video is publicly viewable.
-- [ ] Video demonstrates the Risk Twin, Attack DNA, constellation, intervention comparison and graceful model failure.
+- [x] Architecture diagram renders correctly on GitHub.
+- [x] Five-minute video is publicly viewable.
+- [x] Video demonstrates the Risk Twin, Attack DNA, constellation, intervention comparison and graceful model failure.
 - [ ] Personal details and internship-duration choice are confirmed.
 - [x] No secrets, private datasets or personal information are committed.
 - [x] Project objective and technical-challenge answers are proofread.

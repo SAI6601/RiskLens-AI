@@ -167,6 +167,7 @@ docs/                   Architecture, model card, pitch and application draft
 
 ## Submission assets
 
+- [Five-minute narrated product pitch](https://github.com/SAI6601/RiskLens-AI/releases/download/v1.0-submission/RiskLens_AI_5_Minute_Pitch.mp4) — 4:57, 1080p walkthrough of the decision journey and failure controls
 - [`docs/APPLICATION_ANSWERS.md`](docs/APPLICATION_ANSWERS.md) — form-ready project objective and build challenges
 - [`docs/PITCH_SCRIPT.md`](docs/PITCH_SCRIPT.md) — timed five-minute demonstration script
 - [`docs/PRESENTATION_STORYBOARD.md`](docs/PRESENTATION_STORYBOARD.md) — cinematic shot plan and delivery guidance

@@ -1,67 +1,59 @@
 # Five-minute pitch script
 
-Target duration: 4:40–5:00. Speak naturally and let important transitions breathe.
+Target duration: 4:57. Speak naturally and let the interface breathe between decisions.
 
-Use this narration with [`PRESENTATION_STORYBOARD.md`](PRESENTATION_STORYBOARD.md). Let the opening animation play before the first sentence.
+Use this narration with [`PRESENTATION_STORYBOARD.md`](PRESENTATION_STORYBOARD.md). Dismiss IRIS once before recording, reload, and let the opening animation begin before the first sentence.
 
-## 0:00–0:32 — Cold open
+## 0:00–0:12 — Cold open
 
 “A fraud score is easy. Recognising that a merchant is entering a coordinated attack—and choosing the safest response—is much harder.”
 
-“Payment fraud often forms gradually. Several transactions may look harmless alone, but together they reveal shared devices, unusual velocity and a merchant behaviour shift. I built RiskLens AI: a Merchant Risk Twin that detects the shift, fingerprints the attack and tests bounded interventions before any money action is proposed.”
+## 0:12–0:42 — Product promise
 
-## 0:32–0:58 — Evidence boundary
+“Payment fraud rarely arrives as one obvious event. It forms across small transactions, shared devices and a merchant’s changing behaviour. I built RiskLens AI: a Merchant Risk Twin that detects that shift, reveals the attack pattern and compares bounded responses before any money action is proposed. Permanent automatic blocking is outside the design.”
 
-Show the hero promises and evidence ribbon.
+## 0:42–1:04 — Honest evidence
 
-“RiskLens is human-gated, attack-aware and measured. The model cannot permanently block an account. Every result exposes evidence and enters a minimized audit trail. All numbers I show are from a reproducible chronological synthetic held-out test—not production Razorpay performance.”
+Show the evidence ribbon.
 
-## 0:58–1:30 — Transaction contrast
+“In a held-out chronological synthetic test, the model reached 75.6 percent precision, 87.9 percent recall, 81.3 percent F1 and a 2.4 percent false-positive rate. These are prototype metrics, not Razorpay production results.”
+
+## 1:04–1:34 — Transaction contrast
 
 Analyze **Normal payment**, then **Card-testing burst**.
 
-“An ordinary payment remains below the calibrated threshold. When velocity, failed attempts and device novelty change, the score rises and RiskLens exposes the strongest reason codes instead of hiding behind a black box.”
+“An ordinary payment scores 0.03, below the 0.475 threshold, and is allowed. In a controlled card-testing burst, velocity, failures and device novelty push risk to 0.99. RiskLens shows ranked reasons, not a black box. Yet one suspicious payment cannot prove a merchant attack.”
 
-“But one suspicious payment is not enough to declare a merchant attack. For that we need the incident view.”
-
-## 1:30–2:10 — Merchant Risk Twin
+## 1:34–2:09 — Merchant Risk Twin
 
 Click **Launch the live merchant attack replay** and allow the interface to enter the incident room.
 
-“RiskLens now compares a controlled merchant window with its expected baseline. Merchant 007 moves from an expected risk of approximately 0.08 to a live average near 0.98, while payment velocity rises from about one to fifteen transactions per ten minutes. Minimum-volume guards prevent a single anomaly from becoming an attack claim.”
+“That is why the incident view evaluates a window, not an isolated event. RiskLens compares Merchant 007 against a transparent prototype baseline: average risk moves from 0.08 to 0.98 and velocity from about one to fifteen transactions per ten minutes. Minimum-volume and flagged-count guards stop a single anomaly from being mislabeled as a fraud spike.”
 
-## 2:10–2:48 — Fraud Constellation and Attack DNA
+## 2:09–2:46 — Fraud Constellation and Attack DNA
 
-Pause on the constellation, then scroll to Attack DNA.
+Pause on the constellation, then move to Attack DNA.
 
-“Seven small payments use different pseudonymous instruments, but the relationship graph reveals one shared device and one shared network cluster. These are privacy-safe references—no raw card or IP data.”
+“Seven small payments use different pseudonymous instruments, yet the relationship graph reveals one shared device and one shared network cluster: two suspicious hubs without raw card or IP data. Attack DNA compares transparent signals against three known archetypes. Card testing reaches the strongest heuristic affinity because velocity and failed attempts dominate. This explains a pattern; it does not attribute an attacker.”
 
-“Attack DNA compares transparent signals against three known archetypes. Card testing has the strongest affinity because velocity and failed attempts dominate. This is an explainable heuristic affinity, not attacker attribution.”
-
-## 2:48–3:35 — Intervention Simulator
+## 2:46–3:30 — Intervention Simulator
 
 Show all four intervention cards and the action contract.
 
-“Detection is only half the decision. RiskLens compares four futures: allow, monitor, step-up authentication and temporary hold for review. Each option exposes projected residual loss, loss prevented, customer-friction exposure and analyst workload under documented prototype assumptions.”
+“Detection is only half the decision. RiskLens compares four futures: allow, monitor, step-up authentication and temporary hold for review. Each option exposes projected residual loss, loss prevented, customer-friction exposure and analyst workload under documented prototype assumptions. For this window, step-up authentication has the lowest estimated total cost among containment options. It becomes a fifteen-minute, seven-transaction proposed contract with rollback conditions—not an unlimited autonomous block.”
 
-“For this window, step-up authentication has the lowest estimated total cost among containment options. The system proposes a fifteen-minute action contract limited to seven transactions, with rollback conditions. It remains a proposal—not an unlimited autonomous block.”
+## 3:30–3:57 — Graceful model failure
 
-## 3:35–4:02 — Graceful model failure
+Click **Simulate model failure**, then restore the model after the pause.
 
-Click **Simulate model failure**.
+“A responsible risk system must fail safely, not confidently. When the primary model is unavailable, RiskLens enters degraded safety mode, labels fallback rules, disables automation and marks the human gate as required. It never fabricates model confidence. When the model returns, normal operation is restored.”
 
-“A risk system must also fail safely. When I disconnect the primary model, RiskLens does not fabricate a prediction. It enters degraded safety mode, labels the fallback rules, disables automation and requires human review.”
+## 3:57–4:32 — Architecture and auditability
 
-Click **Restore primary model**.
+Show the architecture flow.
 
-## 4:02–4:35 — Honest evaluation
+“Under the interface, one feature contract feeds an interpretable logistic model, ranked reason codes and the Merchant Risk Twin. The incident layer adds relationship evidence and attack affinity. The policy layer compares bounded actions, then writes privacy-minimized records into a SHA-256 hash chain. Training uses twelve thousand deterministic synthetic events, a chronological 70/15/15 split and a validation-only operating threshold.”
 
-Show the metrics or README comparison.
+## 4:32–4:57 — Honest close
 
-“The transaction model was trained on twelve thousand deterministic synthetic events with a chronological 70/15/15 split. Threshold selection used validation only. On 1,800 held-out events it achieved 75.6 percent precision, 87.9 percent recall, 81.3 percent F1 and a 2.4 percent false-positive rate. The model outperformed a transparent rule baseline, but these results do not establish production performance.”
-
-## 4:35–5:00 — Close
-
-“Production deployment would require approved payment data, learned merchant baselines, calibrated incident affinities, authenticated ingestion, continuous drift monitoring and analyst-feedback governance.”
-
-“RiskLens demonstrates the product principle I would bring to Razorpay: understand how an attack is forming, explain the evidence, compare the consequences and act only within visible limits.”
+“Production would require approved payment data, learned merchant baselines, calibrated incident affinities, authenticated ingestion, drift monitoring and analyst-feedback governance. RiskLens shows the principle I would bring to Razorpay: understand the attack, explain the evidence, compare consequences and act only within visible limits.”

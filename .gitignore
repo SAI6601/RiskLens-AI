@@ -9,5 +9,7 @@ data/generated/
 data/audit/*.jsonl
 artifacts/*.joblib
 artifacts/*.tmp
+artifacts/*.mp4
+artifacts/pitch_audio/
+artifacts/pitch_frames/
 .env
-
