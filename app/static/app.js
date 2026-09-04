@@ -190,6 +190,26 @@ function buildBatch() {
   return transactions;
 }
 
+function buildLegitimateSurge() {
+  const transactions = [];
+  for (let i = 0; i < 16; i += 1) {
+    transactions.push({
+      ...scenarios.normal,
+      transaction_id: `txn_flash_sale_${String(i).padStart(3, "0")}`,
+      merchant_id: "merchant_flash_sale",
+      amount: 780 + i * 13,
+      avg_amount_30d: 850,
+      tx_count_10m: 3 + i % 2,
+      merchant_risk_score: .04,
+      customer_ref: `cus_flash_${String(i).padStart(2, "0")}`,
+      device_ref: `dev_flash_${String(i).padStart(2, "0")}`,
+      payment_instrument_ref: `card_flash_${String(i).padStart(2, "0")}`,
+      network_ref: `net_flash_${String(i).padStart(2, "0")}`,
+    });
+  }
+  return transactions;
+}
+
 function renderConstellation(constellation) {
   const svg = document.querySelector("#constellation-svg");
   const nodes = constellation.nodes.slice(0, 24);
@@ -262,7 +282,8 @@ function renderIncident(data) {
   mode.innerHTML = `<i></i> ${degraded ? "Degraded safety mode" : "Primary model online"}`;
   document.querySelector(".system-status").innerHTML = `<i></i> ${degraded ? "Fallback rules active" : "Model online"}`;
   document.querySelector("#failure-button").textContent = degraded ? "Restore primary model" : "Simulate model failure";
-  document.querySelector("#incident-headline").textContent = degraded ? "Model unavailable · automation disabled" : titleCase(incident.attack_dna.dominant_pattern);
+  const noAttackPattern = incident.attack_dna.dominant_pattern === "no_dominant_attack";
+  document.querySelector("#incident-headline").textContent = degraded ? "Model unavailable · automation disabled" : noAttackPattern ? "No attack pattern resolved" : titleCase(incident.attack_dna.dominant_pattern);
   document.querySelector("#incident-merchant").textContent = incident.merchant_id;
 
   const twin = incident.risk_twin;
@@ -279,7 +300,7 @@ function renderIncident(data) {
   const dna = incident.attack_dna;
   document.querySelector("#dna-fingerprint").textContent = dna.fingerprint_id;
   document.querySelector("#dna-pattern").textContent = titleCase(dna.dominant_pattern);
-  document.querySelector("#dna-confidence").textContent = `${percent(dna.confidence)} affinity`;
+  document.querySelector("#dna-confidence").textContent = noAttackPattern ? "No attack claim" : `${percent(dna.confidence)} heuristic affinity`;
   document.querySelector("#dna-narrative").textContent = dna.narrative;
   document.querySelector("#affinity-bars").innerHTML = Object.entries(dna.pattern_affinities).map(([name, value]) => `
     <div class="affinity-row"><span>${escapeHtml(titleCase(name))}</span><i><b style="width:${value * 100}%"></b></i><strong>${percent(value)}</strong></div>`).join("");
@@ -304,18 +325,28 @@ function renderIncident(data) {
   document.querySelector("#contract-scope").textContent = `${contract.transaction_limit} transactions max`;
   document.querySelector("#contract-gate").textContent = contract.human_gate_required ? "Required" : "Policy gated";
   document.querySelector("#safety-notice").textContent = data.safety_notice;
+  const timelineLabels = noAttackPattern
+    ? ["Baseline stable", "Activity changes", "No shared hubs", "No attack pattern", "Bounded response proposed"]
+    : ["Baseline stable", "Velocity changes", "Shared hubs form", "Attack DNA resolved", "Bounded action proposed"];
+  document.querySelectorAll(".replay-step span").forEach((item, index) => {
+    item.textContent = timelineLabels[index];
+  });
   replayIncidentTimeline();
   refreshIrisGuide();
 }
 
-async function analyzeBatch(simulateFailure = false) {
-  const button = document.querySelector("#batch-button");
+async function analyzeBatch(simulateFailure = false, transactions = buildBatch(), triggerSelector = "#batch-button") {
+  const button = document.querySelector(triggerSelector);
+  const batchButton = document.querySelector("#batch-button");
+  const surgeButton = document.querySelector("#surge-button");
   const failureButton = document.querySelector("#failure-button");
-  button.disabled = true;
+  const idleLabel = button.textContent;
+  batchButton.disabled = true;
+  surgeButton.disabled = true;
   failureButton.disabled = true;
-  button.textContent = simulateFailure ? "Disconnecting primary model…" : "Building merchant risk twin…";
+  button.textContent = simulateFailure ? "Disconnecting primary model…" : triggerSelector === "#surge-button" ? "Testing legitimate activity…" : "Building merchant risk twin…";
   try {
-    const response = await fetch("/api/batch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ transactions: buildBatch(), simulate_model_failure: simulateFailure }) });
+    const response = await fetch("/api/batch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ transactions, simulate_model_failure: simulateFailure }) });
     if (!response.ok) throw new Error(`Batch assessment failed (${response.status})`);
     const data = await response.json();
     document.querySelector("#empty-state").classList.add("hidden");
@@ -323,19 +354,20 @@ async function analyzeBatch(simulateFailure = false) {
     const content = document.querySelector("#batch-content");
     content.classList.remove("hidden");
     if (!reducedMotion()) replayClass(content, "is-entering");
-    document.querySelector("#batch-headline").textContent = data.summary.active_incidents ? "Merchant attack surfaced" : "No merchant incident";
+    document.querySelector("#batch-headline").textContent = data.system_mode === "degraded" ? "Degraded review required" : data.summary.active_incidents ? "Merchant attack surfaced" : "No merchant incident";
     document.querySelector("#batch-stats").innerHTML = [
       ["Transactions", data.summary.transactions], ["Flagged", data.summary.flagged], ["Average risk", data.summary.average_risk.toFixed(2)]
     ].map(([label, value]) => `<div class="batch-stat"><span>${label}</span><strong>${value}</strong></div>`).join("");
-    document.querySelector("#batch-table").innerHTML = data.merchant_spikes.map(row => `<tr><td>${row.merchant_id}</td><td>${row.transaction_count}</td><td>${row.flagged_count}</td><td>${row.average_risk.toFixed(2)}</td><td class="${row.alert ? "alert-yes" : "alert-no"}">${row.alert ? "SPIKE" : "NORMAL"}</td></tr>`).join("");
+    document.querySelector("#batch-table").innerHTML = data.merchant_spikes.map(row => `<tr><td>${row.merchant_id}</td><td>${row.transaction_count}</td><td>${row.flagged_count}</td><td>${row.average_risk.toFixed(2)}</td><td class="${row.alert ? "alert-yes" : "alert-no"}">${row.alert ? "SPIKE" : "NO SPIKE"}</td></tr>`).join("");
     renderIncident(data);
     document.querySelector("#incident").scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" });
   } catch (error) {
     alert(error.message);
   } finally {
-    button.disabled = false;
+    batchButton.disabled = false;
+    surgeButton.disabled = false;
     failureButton.disabled = false;
-    button.textContent = "Launch the live merchant attack replay";
+    button.textContent = idleLabel;
   }
 }
 
@@ -354,6 +386,7 @@ document.querySelectorAll(".scenario-tab").forEach((tab, index) => {
 });
 document.querySelector("#analyze-button").addEventListener("click", analyze);
 document.querySelector("#batch-button").addEventListener("click", () => analyzeBatch(false));
+document.querySelector("#surge-button").addEventListener("click", () => analyzeBatch(false, buildLegitimateSurge(), "#surge-button"));
 document.querySelector("#failure-button").addEventListener("click", () => analyzeBatch(currentSystemMode === "normal"));
 
 const irisSteps = [
@@ -366,7 +399,7 @@ const irisSteps = [
   {
     kicker: "Choose a signal",
     title: "Start with a payment",
-    message: "Compare a normal payment with card testing, account takeover or an abuse ring. Each scenario changes visible risk evidence.",
+    message: "Compare a normal payment with card testing, account takeover or an abuse ring. Then challenge the incident layer with a legitimate sales surge.",
     target: ".scenario-tabs",
   },
   {

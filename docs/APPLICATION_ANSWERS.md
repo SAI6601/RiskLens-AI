@@ -38,11 +38,14 @@ Finally, a single high-risk transaction should not be called a merchant fraud sp
 
 The final challenge was moving from a score to a responsible incident decision. I added a Merchant Risk Twin, heuristic Attack DNA, pseudonymous relationship hubs and a four-option intervention simulator. Every output remains bounded by a temporary action contract. I also implemented a demonstrable model-failure path that disables automation and requires human review instead of silently fabricating confidence.
 
+Before submission, I added a deterministic five-window incident-safety challenge covering ordinary activity, a legitimate flash-sale surge, an ambiguous device shift, a connected card-testing burst and the same attack during a model outage. The first run exposed that an ambiguous `watch` state could escalate to a temporary hold. I corrected the policy so `watch` produces monitoring, kept bounded containment for the known attack, and made the challenge a required CI step. The 5/5 result is explicitly labelled as a controlled safety check—not independent production accuracy.
+
 ## Final-submission checklist
 
 - [x] Repository is public and cloneable.
 - [x] README commands work in a clean environment.
 - [x] Held-out metrics match `artifacts/metrics.json`.
+- [x] Controlled incident-safety challenge passes in CI.
 - [x] Architecture diagram renders correctly on GitHub.
 - [x] Five-minute video is publicly viewable.
 - [x] Video demonstrates the Risk Twin, Attack DNA, constellation, intervention comparison and graceful model failure.

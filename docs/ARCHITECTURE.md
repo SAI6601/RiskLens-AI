@@ -71,6 +71,7 @@ The calibrated fraud threshold is currently `0.475`. It was selected on validati
 - Batch size is bounded to 500 transactions.
 - A merchant spike requires at least 5 transactions, 3 flags and a 30% flagged rate.
 - Fewer than 5 transactions produces `insufficient_evidence`, never an attack claim.
+- A mild `watch` state can only produce monitoring, never a temporary hold.
 - Near-boundary or outlying inputs reduce the automation-eligibility heuristic.
 - A simulated model outage switches to labelled fallback rules and disables automation.
 - High-impact or degraded action contracts require a human gate and always expire.

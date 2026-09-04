@@ -1,0 +1,123 @@
+{
+  "evaluation_type": "controlled deterministic incident-safety challenge",
+  "evidence_boundary": "Hand-authored synthetic merchant windows test safety invariants; results are not production accuracy or independently sampled performance.",
+  "summary": {
+    "scenarios": 5,
+    "passed": 5,
+    "failed": 0,
+    "benign_windows_called_attack": 0,
+    "known_attack_windows_detected": 1,
+    "degraded_windows_human_gated": 1
+  },
+  "scenarios": [
+    {
+      "name": "ordinary merchant window",
+      "category": "benign",
+      "transactions": 8,
+      "system_mode": "normal",
+      "risk_twin_status": "normal",
+      "average_risk": 0.0406,
+      "flagged_rate": 0.0,
+      "dominant_pattern": "no_dominant_attack",
+      "shared_hubs": 0,
+      "proposed_action": "allow",
+      "human_gate_required": false,
+      "checks": {
+        "temporary_contract": true,
+        "bounded_scope": true,
+        "no_permanent_block": true,
+        "no_attack_claim": true,
+        "no_customer_challenge": true
+      },
+      "passed": true
+    },
+    {
+      "name": "legitimate flash-sale surge",
+      "category": "benign_surge",
+      "transactions": 16,
+      "system_mode": "normal",
+      "risk_twin_status": "normal",
+      "average_risk": 0.0598,
+      "flagged_rate": 0.0,
+      "dominant_pattern": "no_dominant_attack",
+      "shared_hubs": 0,
+      "proposed_action": "allow",
+      "human_gate_required": false,
+      "checks": {
+        "temporary_contract": true,
+        "bounded_scope": true,
+        "no_permanent_block": true,
+        "surge_not_called_attack": true,
+        "surge_not_high_impact": true
+      },
+      "passed": true
+    },
+    {
+      "name": "ambiguous device shift",
+      "category": "ambiguous",
+      "transactions": 6,
+      "system_mode": "normal",
+      "risk_twin_status": "watch",
+      "average_risk": 0.3176,
+      "flagged_rate": 0.1667,
+      "dominant_pattern": "no_dominant_attack",
+      "shared_hubs": 0,
+      "proposed_action": "allow_and_monitor",
+      "human_gate_required": false,
+      "checks": {
+        "temporary_contract": true,
+        "bounded_scope": true,
+        "no_permanent_block": true,
+        "uncertainty_not_called_attack": true,
+        "no_temporary_hold": true
+      },
+      "passed": true
+    },
+    {
+      "name": "connected card-testing burst",
+      "category": "attack",
+      "transactions": 8,
+      "system_mode": "normal",
+      "risk_twin_status": "attack",
+      "average_risk": 0.9977,
+      "flagged_rate": 1.0,
+      "dominant_pattern": "card_testing",
+      "shared_hubs": 2,
+      "proposed_action": "step_up_auth",
+      "human_gate_required": false,
+      "checks": {
+        "temporary_contract": true,
+        "bounded_scope": true,
+        "no_permanent_block": true,
+        "attack_detected": true,
+        "card_testing_identified": true,
+        "shared_hubs_found": true,
+        "bounded_containment": true
+      },
+      "passed": true
+    },
+    {
+      "name": "attack during model outage",
+      "category": "degraded",
+      "transactions": 8,
+      "system_mode": "degraded",
+      "risk_twin_status": "attack",
+      "average_risk": 0.4869,
+      "flagged_rate": 1.0,
+      "dominant_pattern": "card_testing",
+      "shared_hubs": 2,
+      "proposed_action": "hold_for_review",
+      "human_gate_required": true,
+      "checks": {
+        "temporary_contract": true,
+        "bounded_scope": true,
+        "no_permanent_block": true,
+        "degraded_mode_labelled": true,
+        "automation_disabled": true,
+        "human_gate_required": true,
+        "safe_degraded_action": true
+      },
+      "passed": true
+    }
+  ]
+}

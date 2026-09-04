@@ -69,6 +69,18 @@ Confusion matrix: TN 1,619, FP 40, FN 17, TP 124.
 
 The estimated-cost comparison depends on the explicit prototype assumptions above and should not be generalized to a real business without validation.
 
+## Controlled incident safety challenge
+
+Five deterministic, hand-authored merchant windows exercise end-to-end safety behaviour around the transaction model:
+
+- ordinary activity remains `normal` and is allowed;
+- a legitimate flash-sale surge remains `normal` and is allowed;
+- an ambiguous device shift becomes `watch` and is monitored rather than held;
+- a connected card-testing burst becomes `attack` and receives bounded step-up authentication;
+- the attack under a simulated model outage uses labelled fallback rules and a human-gated temporary hold.
+
+All five currently pass. This is a regression and product-invariant suite, not an independently sampled benchmark. See [`../artifacts/incident_challenge.json`](../artifacts/incident_challenge.json).
+
 ## Explainability
 
 For each prediction, standardized feature values are multiplied by their logistic coefficients. The three strongest positive contributions become human-readable reason codes. This explains the model's local evidence but does not prove causality.
@@ -94,6 +106,7 @@ The Merchant Risk Twin, Attack DNA, Fraud Constellation and Intervention Simulat
 6. Audit persistence is a local hash-linked JSONL demonstration. It can reveal edits after the fact but is not an externally anchored, access-controlled production ledger.
 7. Merchant baselines are prototype expectations supplied or derived from synthetic features, not learned production merchant profiles.
 8. Attack affinities and intervention projections have not been validated on external incidents.
+9. The five-window incident challenge is hand-authored and too small to estimate real-world incident-level error rates.
 
 ## Monitoring required before production
 

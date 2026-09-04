@@ -397,8 +397,8 @@ class IncidentEngine:
 
         if system_mode == "degraded":
             recommended_action = "hold_for_review" if twin.status in {"attack", "elevated"} else "allow_and_monitor"
-        elif twin.status in {"normal", "insufficient_evidence"}:
-            recommended_action = "allow_and_monitor" if twin.status == "insufficient_evidence" else "allow"
+        elif twin.status in {"normal", "watch", "insufficient_evidence"}:
+            recommended_action = "allow" if twin.status == "normal" else "allow_and_monitor"
         elif dna.confidence < 0.55:
             recommended_action = "hold_for_review"
         else:

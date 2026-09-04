@@ -104,6 +104,9 @@ h1 em, h2 em { font-family: Georgia, serif; font-weight: 400; color: var(--mint-
 .preview-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 2px; border-bottom: 1px solid var(--line); }
 .preview-row span { color: var(--muted); font-size: 11px; }.preview-row strong { font: 500 11px var(--mono); }
 .text-button { border: 0; background: none; margin: 16px auto 0; display: block; cursor: pointer; color: var(--mint-dark); font-size: 11px; font-weight: 700; }
+.text-button + .text-button { margin-top: 9px; }
+.safety-check-button { color: #4866b1; }
+.text-button:disabled { cursor: wait; opacity: .55; }
 .decision-panel { background: #f8faf7; }
 .empty-state { min-height: 450px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 .empty-state strong { font-size: 15px; margin-top: 22px; }.empty-state p { color: var(--muted); font-size: 12px; }

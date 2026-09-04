@@ -36,6 +36,22 @@ Against the transparent rule baseline, the learned model improved F1 from **52.2
 
 The report also exposes false-positive review cost, caught fraud amount, missed fraud amount, Brier score and a transparent rule baseline. Exact generated values live in [`artifacts/metrics.json`](artifacts/metrics.json).
 
+## Controlled incident safety challenge
+
+Transaction metrics cannot prove that the merchant-level policy behaves safely. A second deterministic challenge therefore checks five contrasting windows end to end:
+
+| Merchant window | Risk Twin | Proposed response | Safety outcome |
+|---|---|---|---|
+| Ordinary activity | Normal | Allow | Pass |
+| Legitimate flash-sale surge | Normal | Allow | Pass |
+| Ambiguous device shift | Watch | Allow and monitor | Pass |
+| Connected card-testing burst | Attack | Step-up authentication | Pass |
+| Card-testing burst during model outage | Attack · degraded | Hold for review · human-gated | Pass |
+
+Run it with `python scripts/evaluate_incidents.py`. The machine-readable report is [`artifacts/incident_challenge.json`](artifacts/incident_challenge.json), and CI fails if any safety invariant fails.
+
+> **Challenge boundary:** these are five hand-authored synthetic merchant windows. A 5/5 pass demonstrates the specified control behaviour; it is not an independent accuracy estimate or production validation.
+
 ## Why this is more than a fraud score
 
 1. **Merchant Risk Twin:** compares the current risk, velocity, flagged rate and device novelty with a documented merchant baseline.
@@ -82,6 +98,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 python scripts\train_model.py
+python scripts\evaluate_incidents.py
 python -m uvicorn app.main:app --reload
 ```
 
@@ -99,13 +116,14 @@ The application trains a model automatically at startup when no artifact exists,
 python -m unittest discover -s tests -v
 ```
 
-The 11-test suite covers:
+The 13-test suite covers:
 
 - deterministic data generation;
 - chronological split boundaries;
 - low-risk and card-testing decisions;
 - minimum-volume spike guards;
 - Merchant Risk Twin attack and insufficient-evidence states;
+- legitimate flash-sale and ambiguous-watch safety behaviour;
 - Attack DNA and privacy-safe relationship hubs;
 - degraded-mode automation shutdown and human-gated contracts;
 - hash-linked audit integrity;
